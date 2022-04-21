@@ -7,7 +7,8 @@
 
 		<!-- Bootstrap CSS -->
 		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-
+		<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+		<script src="elevator.js?rev=2"></script>
 		<link rel="stylesheet" href="style.css?rev=1">
 		<title>Elevator Simulator</title>
 	</head>
@@ -16,32 +17,32 @@
 			<div class="row">
 				<div class="col">
 					<div class="container border m-2 p-2">
-						<input class="btn btn-dark" type="button" value=1>
-						<input class="btn btn-dark" type="button" value=2>
-						<input class="btn btn-dark" type="button" value=3>
-						<input class="btn btn-dark" type="button" value=4>
-						<input class="btn btn-dark" type="button" value=5>
-						<input class="btn btn-dark" type="button" value=6>
-						<input class="btn btn-dark" type="button" value=7>
-						<input class="btn btn-dark" type="button" value=8>
-						<input class="btn btn-dark" type="button" value=9>
-						<input class="btn btn-dark" type="button" value=10>
+						<input class="btn btn-dark floor10" type="button" value=1>
+						<input class="btn btn-dark floor10" type="button" value=2>
+						<input class="btn btn-dark floor10" type="button" value=3>
+						<input class="btn btn-dark floor10" type="button" value=4>
+						<input class="btn btn-dark floor10" type="button" value=5>
+						<input class="btn btn-dark floor10" type="button" value=6>
+						<input class="btn btn-dark floor10" type="button" value=7>
+						<input class="btn btn-dark floor10" type="button" value=8>
+						<input class="btn btn-dark floor10" type="button" value=9>
+						<input class="btn btn-dark floor10" type="button" value=10>
 					</div>
 				</div>
 
 				<div class="col-2">
-					<div class="border border-3 border-dark m-2 p-2 floor10 indicator">
+					<div class="border border-3 border-dark m-2 p-2 f10 indicator elevator1" id="e1f10" value=10>
 						Elevator 1 : Floor 10
 					</div>
 				</div>
 				<div class="col-2">
-                                        <div class="border border-3 border-dark m-2 p-2 floor10 indicator">
+                                        <div class="border border-3 border-dark m-2 p-2 f10 indicator elevator2" id="e2f10" value=10>
                                                 Elevator 2 : Floor 10
                                         </div>
                                 </div>
 
                                 <div class="col-2">
-                                        <div class="border border-3 border-dark m-2 p-2 floor10 indicator">
+                                        <div class="border border-3 border-dark m-2 p-2 f10 indicator elevator3" id=e3f10" value=10>
                                                 Elevator 3 : Floor 10
                                         </div>
                                 </div>
@@ -51,32 +52,32 @@
 			<div class="row">
 				<div class="col">
 					<div class="container border m-2 p-2">
-						<input class="btn btn-dark" type="button" value=1>
-						<input class="btn btn-dark" type="button" value=2>
-						<input class="btn btn-dark" type="button" value=3>
-						<input class="btn btn-dark" type="button" value=4>
-						<input class="btn btn-dark" type="button" value=5>
-						<input class="btn btn-dark" type="button" value=6>
-						<input class="btn btn-dark" type="button" value=7>
-						<input class="btn btn-dark" type="button" value=8>
-						<input class="btn btn-dark" type="button" value=9>
-						<input class="btn btn-dark" type="button" value=10>
+						<input class="btn btn-dark floor9" type="button" value=1>
+						<input class="btn btn-dark floor9" type="button" value=2>
+						<input class="btn btn-dark floor9" type="button" value=3>
+						<input class="btn btn-dark floor9" type="button" value=4>
+						<input class="btn btn-dark floor9" type="button" value=5>
+						<input class="btn btn-dark floor9" type="button" value=6>
+						<input class="btn btn-dark floor9" type="button" value=7>
+						<input class="btn btn-dark floor9" type="button" value=8>
+						<input class="btn btn-dark floor9" type="button" value=9>
+						<input class="btn btn-dark floor9" type="button" value=10>
 					</div>
 				</div>
 
 				<div class="col-2">
-					<div class="border border-3 border-dark m-2 p-2 floor9 indicator">
+					<div class="border border-3 border-dark m-2 p-2 f9 indicator elevator1" id="e1f9" value=9>
 						Elevator 1 : Floor 9
 					</div>
 				</div>
 				<div class="col-2">
-                                        <div class="border border-3 border-dark m-2 p-2 floor9 indicator">
+                                        <div class="border border-3 border-dark m-2 p-2 f9 indicator elevator2" id="e2f9" value=9>
                                                 Elevator 2 : Floor 9
                                         </div>
                                 </div>
 
                                 <div class="col-2">
-                                        <div class="border border-3 border-dark m-2 p-2 floor9 indicator">
+                                        <div class="border border-3 border-dark m-2 p-2 f9 indicator elevator3" id="e3f9" value=9>
                                                 Elevator 3 : Floor 9
                                         </div>
                                 </div>
@@ -86,33 +87,33 @@
 			<div class="row">
 				<div class="col">
 					<div class="container border m-2 p-2">
-						<input class="btn btn-dark" type="button" value=1>
-						<input class="btn btn-dark" type="button" value=2>
-						<input class="btn btn-dark" type="button" value=3>
-						<input class="btn btn-dark" type="button" value=4>
-						<input class="btn btn-dark" type="button" value=5>
-						<input class="btn btn-dark" type="button" value=6>
-						<input class="btn btn-dark" type="button" value=7>
-						<input class="btn btn-dark" type="button" value=8>
-						<input class="btn btn-dark" type="button" value=9>
-						<input class="btn btn-dark" type="button" value=10>
+						<input class="btn btn-dark floor8" type="button" value=1>
+						<input class="btn btn-dark floor8" type="button" value=2>
+						<input class="btn btn-dark floor8" type="button" value=3>
+						<input class="btn btn-dark floor8" type="button" value=4>
+						<input class="btn btn-dark floor8" type="button" value=5>
+						<input class="btn btn-dark floor8" type="button" value=6>
+						<input class="btn btn-dark floor8" type="button" value=7>
+						<input class="btn btn-dark floor8" type="button" value=8>
+						<input class="btn btn-dark floor8" type="button" value=9>
+						<input class="btn btn-dark floor8" type="button" value=10>
 
 					</div>
 				</div>
 
 				<div class="col-2">
-					<div class="border border-3 border-dark m-2 p-2 floor8 indicator">
+					<div class="border border-3 border-dark m-2 p-2 f8 indicator elevator1" id="e1f8" value=8>
 						Elevator 1 : Floor 8
 					</div>
 				</div>
 				<div class="col-2">
-                                        <div class="border border-3 border-dark m-2 p-2 floor8 indicator">
+                                        <div class="border border-3 border-dark m-2 p-2 f8 indicator elevator2" id="e2f8" value=8>
                                                 Elevator 2 : Floor 8
                                         </div>
                                 </div>
 
                                 <div class="col-2">
-                                        <div class="border border-3 border-dark m-2 p-2 floor8 indicator">
+                                        <div class="border border-3 border-dark m-2 p-2 f8 indicator elevator3" id="e3f8" value=8>
                                                 Elevator 3 : Floor 8
                                         </div>
                                 </div>
@@ -121,33 +122,33 @@
 
 			<div class="row">
 				<div class="col">
-					<div class="container border m-2 p-2">
-						<input class="btn btn-dark" type="button" value=1>
-						<input class="btn btn-dark" type="button" value=2>
-						<input class="btn btn-dark" type="button" value=3>
-						<input class="btn btn-dark" type="button" value=4>
-						<input class="btn btn-dark" type="button" value=5>
-						<input class="btn btn-dark" type="button" value=6>
-						<input class="btn btn-dark" type="button" value=7>
-						<input class="btn btn-dark" type="button" value=8>
-						<input class="btn btn-dark" type="button" value=9>
-						<input class="btn btn-dark" type="button" value=10>
+					<div class="container border m-2 p-2 floor7">
+						<input class="btn btn-dark floor7" type="button" value=1>
+						<input class="btn btn-dark floor7" type="button" value=2>
+						<input class="btn btn-dark floor7" type="button" value=3>
+						<input class="btn btn-dark floor7" type="button" value=4>
+						<input class="btn btn-dark floor7" type="button" value=5>
+						<input class="btn btn-dark floor7" type="button" value=6>
+						<input class="btn btn-dark floor7" type="button" value=7>
+						<input class="btn btn-dark floor7" type="button" value=8>
+						<input class="btn btn-dark floor7" type="button" value=9>
+						<input class="btn btn-dark floor7" type="button" value=10>
 					</div>
 				</div>
 
 				<div class="col-2">
-					<div class="border border-3 border-dark m-2 p-2 floor7 indicator">
+					<div class="border border-3 border-dark m-2 p-2 f7 indicator elevator1" id="e1f7" value=7>
 						Elevator 1 : Floor 7
 					</div>
 				</div>
 				<div class="col-2">
-                                        <div class="border border-3 border-dark m-2 p-2 floor7 indicator">
+                                        <div class="border border-3 border-dark m-2 p-2 f7 indicator elevator2" id="e2f7" value=7>
                                                 Elevator 2 : Floor 7
                                         </div>
                                 </div>
 
                                 <div class="col-2">
-                                        <div class="border border-3 border-dark m-2 p-2 floor7 indicator">
+                                        <div class="border border-3 border-dark m-2 p-2 f7 indicator elevator3" id="e3f7" value=7>
                                                 Elevator 3 : Floor 7
                                         </div>
                                 </div>
@@ -157,32 +158,32 @@
 			<div class="row">
 				<div class="col">
 					<div class="container border m-2 p-2">
-						<input class="btn btn-dark" type="button" value=1>
-						<input class="btn btn-dark" type="button" value=2>
-						<input class="btn btn-dark" type="button" value=3>
-						<input class="btn btn-dark" type="button" value=4>
-						<input class="btn btn-dark" type="button" value=5>
-						<input class="btn btn-dark" type="button" value=6>
-						<input class="btn btn-dark" type="button" value=7>
-						<input class="btn btn-dark" type="button" value=8>
-						<input class="btn btn-dark" type="button" value=9>
-						<input class="btn btn-dark" type="button" value=10>
+						<input class="btn btn-dark floor6" type="button" value=1>
+						<input class="btn btn-dark floor6" type="button" value=2>
+						<input class="btn btn-dark floor6" type="button" value=3>
+						<input class="btn btn-dark floor6" type="button" value=4>
+						<input class="btn btn-dark floor6" type="button" value=5>
+						<input class="btn btn-dark floor6" type="button" value=6>
+						<input class="btn btn-dark floor6" type="button" value=7>
+						<input class="btn btn-dark floor6" type="button" value=8>
+						<input class="btn btn-dark floor6" type="button" value=9>
+						<input class="btn btn-dark floor6" type="button" value=10>
 					</div>
 				</div>
 
 				<div class="col-2">
-					<div class="border border-3 border-dark m-2 p-2 floor6 indicator">
+					<div class="border border-3 border-dark m-2 p-2 f6 indicator elevator1" id="e1f6" value=6>
 						Elevator 1 : Floor 6
 					</div>
 				</div>
 				<div class="col-2">
-                                        <div class="border border-3 border-dark m-2 p-2 floor6 indicator">
+                                        <div class="border border-3 border-dark m-2 p-2 f6 indicator elevator2" id="e2f6" value=6>
                                                 Elevator 2 : Floor 6
                                         </div>
                                 </div>
 
                                 <div class="col-2">
-                                        <div class="border border-3 border-dark m-2 p-2 floor6 indicator">
+                                        <div class="border border-3 border-dark m-2 p-2 f6 indicator elevator3" id="e3f6" value=6>
                                                 Elevator 3 : Floor 6
                                         </div>
                                 </div>
@@ -191,33 +192,33 @@
 
 			<div class="row">
 				<div class="col">
-					<div class="container border m-2 p-2">
-						<input class="btn btn-dark" type="button" value=1>
-						<input class="btn btn-dark" type="button" value=2>
-						<input class="btn btn-dark" type="button" value=3>
-						<input class="btn btn-dark" type="button" value=4>
-						<input class="btn btn-dark" type="button" value=5>
-						<input class="btn btn-dark" type="button" value=6>
-						<input class="btn btn-dark" type="button" value=7>
-						<input class="btn btn-dark" type="button" value=8>
-						<input class="btn btn-dark" type="button" value=9>
-						<input class="btn btn-dark" type="button" value=10>
+					<div class="container border m-2 p-2 floor5">
+						<input class="btn btn-dark floor5" type="button" value=1>
+						<input class="btn btn-dark floor5" type="button" value=2>
+						<input class="btn btn-dark floor5" type="button" value=3>
+						<input class="btn btn-dark floor5" type="button" value=4>
+						<input class="btn btn-dark floor5" type="button" value=5>
+						<input class="btn btn-dark floor5" type="button" value=6>
+						<input class="btn btn-dark floor5" type="button" value=7>
+						<input class="btn btn-dark floor5" type="button" value=8>
+						<input class="btn btn-dark floor5" type="button" value=9>
+						<input class="btn btn-dark floor5" type="button" value=10>
 					</div>
 				</div>
 
 				<div class="col-2">
-					<div class="border border-3 border-dark m-2 p-2 floor5 indicator">
+					<div class="border border-3 border-dark m-2 p-2 f5 indicator elevator1" id="e1f5" value=5>  
 						Elevator 1 : Floor 5
 					</div>
 				</div>
 				<div class="col-2">
-                                        <div class="border border-3 border-dark m-2 p-2 floor5 indicator">
+                                        <div class="border border-3 border-dark m-2 p-2 f5 indicator elevator2" id="e2f5" value=5>
                                                 Elevator 2 : Floor 5
                                         </div>
                                 </div>
 
                                 <div class="col-2">
-                                        <div class="border border-3 border-dark m-2 p-2 floor5 indicator">
+                                        <div class="border border-3 border-dark m-2 p-2 f5 indicator elevator3" id="e3f5" value=5>
                                                 Elevator 3 : Floor 5
                                         </div>
                                 </div>
@@ -227,32 +228,32 @@
 			<div class="row">
 				<div class="col">
 					<div class="container border m-2 p-2">
-						<input class="btn btn-dark" type="button" value=1>
-						<input class="btn btn-dark" type="button" value=2>
-						<input class="btn btn-dark" type="button" value=3>
-						<input class="btn btn-dark" type="button" value=4>
-						<input class="btn btn-dark" type="button" value=5>
-						<input class="btn btn-dark" type="button" value=6>
-						<input class="btn btn-dark" type="button" value=7>
-						<input class="btn btn-dark" type="button" value=8>
-						<input class="btn btn-dark" type="button" value=9>
-						<input class="btn btn-dark" type="button" value=10>
+						<input class="btn btn-dark floor4" type="button" value=1>
+						<input class="btn btn-dark floor4" type="button" value=2>
+						<input class="btn btn-dark floor4" type="button" value=3>
+						<input class="btn btn-dark floor4" type="button" value=4>
+						<input class="btn btn-dark floor4" type="button" value=5>
+						<input class="btn btn-dark floor4" type="button" value=6>
+						<input class="btn btn-dark floor4" type="button" value=7>
+						<input class="btn btn-dark floor4" type="button" value=8>
+						<input class="btn btn-dark floor4" type="button" value=9>
+						<input class="btn btn-dark floor4" type="button" value=10>
 					</div>
 				</div>
 
 				<div class="col-2">
-					<div class="border border-3 border-dark m-2 p-2 floor4 indicator">
+					<div class="border border-3 border-dark m-2 p-2 f4 indicator elevator1" id="e1f4" value=4>
 						Elevator 1 : Floor 4
 					</div>
 				</div>
 				<div class="col-2">
-                                        <div class="border border-3 border-dark m-2 p-2 floor4 indicator">
+                                        <div class="border border-3 border-dark m-2 p-2 f4 indicator elevator2" id="e2f4" value=4>
                                                 Elevator 2 : Floor 4
                                         </div>
                                 </div>
 
                                 <div class="col-2">
-                                        <div class="border border-3 border-dark m-2 p-2 floor4 indicator">
+                                        <div class="border border-3 border-dark m-2 p-2 f4 indicator elevator3" id="e3f4" value=4>
                                                 Elevator 3 : Floor 4
                                         </div>
                                 </div>
@@ -262,33 +263,33 @@
 
 			<div class="row">
 				<div class="col">
-					<div class="container border m-2 p-2">
-						<input class="btn btn-dark" type="button" value=1>
-						<input class="btn btn-dark" type="button" value=2>
-						<input class="btn btn-dark" type="button" value=3>
-						<input class="btn btn-dark" type="button" value=4>
-						<input class="btn btn-dark" type="button" value=5>
-						<input class="btn btn-dark" type="button" value=6>
-						<input class="btn btn-dark" type="button" value=7>
-						<input class="btn btn-dark" type="button" value=8>
-						<input class="btn btn-dark" type="button" value=9>
-						<input class="btn btn-dark" type="button" value=10>
+					<div class="container border m-2 p-2 floor3">
+						<input class="btn btn-dark floor3" type="button" value=1>
+						<input class="btn btn-dark floor3" type="button" value=2>
+						<input class="btn btn-dark floor3" type="button" value=3>
+						<input class="btn btn-dark floor3" type="button" value=4>
+						<input class="btn btn-dark floor3" type="button" value=5>
+						<input class="btn btn-dark floor3" type="button" value=6>
+						<input class="btn btn-dark floor3" type="button" value=7>
+						<input class="btn btn-dark floor3" type="button" value=8>
+						<input class="btn btn-dark floor3" type="button" value=9>
+						<input class="btn btn-dark floor3" type="button" value=10>
 					</div>
 				</div>
 
 				<div class="col-2">
-					<div class="border border-3 border-dark m-2 p-2 floor3 indicator">
+					<div class="border border-3 border-dark m-2 p-2 f3 indicator elevator1" id="e1f3" value=3>
 						Elevator 1 : Floor 3
 					</div>
 				</div>
 				<div class="col-2">
-                                        <div class="border border-3 border-dark m-2 p-2 floor3 indicator">
+                                        <div class="border border-3 border-dark m-2 p-2 f3 indicator elevator2" id="e2f3" value=3>
                                                 Elevator 2 : Floor 3
                                         </div>
                                 </div>
 
                                 <div class="col-2">
-                                        <div class="border border-3 border-dark m-2 p-2 floor3 indicator">
+                                        <div class="border border-3 border-dark m-2 p-2 f3 indicator elevator3" id="e3f3" value=3>
                                                 Elevator 3 : Floor 3
                                         </div>
                                 </div>
@@ -298,32 +299,32 @@
 			<div class="row">
 				<div class="col">
 					<div class="container border m-2 p-2">
-						<input class="btn btn-dark" type="button" value=1> 
-						<input class="btn btn-dark" type="button" value=2>
-						<input class="btn btn-dark" type="button" value=3>
-						<input class="btn btn-dark" type="button" value=4>
-						<input class="btn btn-dark" type="button" value=5>
-						<input class="btn btn-dark" type="button" value=6>
-						<input class="btn btn-dark" type="button" value=7>
-						<input class="btn btn-dark" type="button" value=8>
-						<input class="btn btn-dark" type="button" value=9>
-						<input class="btn btn-dark" type="button" value=10>
+						<input class="btn btn-dark floor2" type="button" value=1 data-floor=2> 
+						<input class="btn btn-dark floor2" type="button" value=2 data-floor=2>
+						<input class="btn btn-dark floor2" type="button" value=3 data-floor=2>
+						<input class="btn btn-dark floor2" type="button" value=4 data-floor=2>
+						<input class="btn btn-dark floor2" type="button" value=5 data-floor=2>
+						<input class="btn btn-dark floor2" type="button" value=6 data-floor=2>
+						<input class="btn btn-dark floor2" type="button" value=7 data-floor=2>
+						<input class="btn btn-dark floor2" type="button" value=8 data-floor=2>
+						<input class="btn btn-dark floor2" type="button" value=9 data-floor=2>
+						<input class="btn btn-dark floor2" type="button" value=10 data-floor=2>
 					</div>
 				</div>
 
 				<div class="col-2">
-					<div class="border border-3 border-dark m-2 p-2 floor2 indicator">
+					<div class="border border-3 border-dark m-2 p-2 f2 indicator elevator1" id="e1f2" value=2>
 						Elevator 1 : Floor 2
 					</div>
 				</div>
 				<div class="col-2">
-					<div class="border border-3 border-dark m-2 p-2 floor2 indicator">
+					<div class="border border-3 border-dark m-2 p-2 f2 indicator elevator2" id="e2f2" value=2>
 						Elevator 2 : Floor 2
 					</div>
 				</div>
 
 				<div class="col-2">
-					<div class="border border-3 border-dark m-2 p-2 floor2 indicator">
+					<div class="border border-3 border-dark m-2 p-2 f2 indicator elevator3" id="e3f2" value=2>
 						Elevator 3 : Floor 2
 					</div>
 				</div>
@@ -332,34 +333,34 @@
 
 			<div class="row">
 				<div class="col">
-					<div class="container border m-2 p-2">
-						<input class="btn btn-dark" type="button" value=1>
-						<input class="btn btn-dark" type="button" value=2>
-						<input class="btn btn-dark" type="button" value=3>
-						<input class="btn btn-dark" type="button" value=4>
-						<input class="btn btn-dark" type="button" value=5>
-						<input class="btn btn-dark" type="button" value=6>
-						<input class="btn btn-dark" type="button" value=7>
-						<input class="btn btn-dark" type="button" value=8>
-						<input class="btn btn-dark" type="button" value=9>
-						<input class="btn btn-dark" type="button" value=10>
+					<div class="container border m-2 p-2 floor1">
+						<input class="btn btn-dark floor1" type="button" value=1 data-floor=1>
+						<input class="btn btn-dark floor1" type="button" value=2 data-floor=1>
+						<input class="btn btn-dark floor1" type="button" value=3 data-floor=1>
+						<input class="btn btn-dark floor1" type="button" value=4 data-floor=1>
+						<input class="btn btn-dark floor1" type="button" value=5 data-floor=1>
+						<input class="btn btn-dark floor1" type="button" value=6 data-floor=1>
+						<input class="btn btn-dark floor1" type="button" value=7 data-floor=1>
+						<input class="btn btn-dark floor1" type="button" value=8 data-floor=1>
+						<input class="btn btn-dark floor1" type="button" value=9 data-floor=1>
+						<input class="btn btn-dark floor1" type="button" value=10 data-floor=1>
 					</div>
 				</div>
 
 
 				<div class="col-2">
-					<div class="border border-3 border-dark m-2 p-2 floor1 indicator">
+					<div class="border border-3 border-dark m-2 p-2 f1 indicator elevator1" id="e1f1" value=1>
 						Elevator 1 : Floor 1
 					</div>
 				</div>
 				<div class="col-2">
-					<div class="border border-3 border-dark m-2 p-2 floor1 indicator">
+					<div class="border border-3 border-dark m-2 p-2 f1 indicator elevator2" id="e2f1" value=1>
 						Elevator 2 : Floor 1
 					</div>
 				</div>
 
 				<div class="col-2">
-					<div class="border border-3 border-dark m-2 p-2 floor1 indicator">
+					<div class="border border-3 border-dark m-2 p-2 f1 indicator elevator3" id="e3f1" value=1>
 						Elevator 3 : Floor 1
 					</div>
 				</div>
