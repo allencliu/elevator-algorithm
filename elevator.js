@@ -1,63 +1,181 @@
+class Queue {
+	constructor() {
+		this.elements = {};
+		this.head = 0;
+		this.tail = 0;
+	}
+	push(element) {
+		this.elements[this.tail] = element;
+		this.tail++;
+	}
+	pop() {
+		const item = this.elements[this.head];
+		delete this.elements[this.head];
+		this.head++;
+		return item;
+	}
+	peek() {
+		return this.elements[this.head];
+	}
+	length() {
+		return this.tail - this.head;
+	}
+	isEmpty() {
+		return this.length === 0;
+	}
+}
+
+class Passenger {
+	constructor(startFloor, elevCurFloor, elevator) {
+		
+	}
+
+}
+
+
+var elevator1Full = false;
+var queue = new Queue();
 $( document ).ready(function() {
 	$(".floor1").click(function() {
-		var elevCurFloor = $(".curFloor1")[0].getAttribute("data-curFloor");
+		queue.push(this.getAttribute("data-floor"));
+		var elevCurFloor;
 		var dest = $(this).val();
-		var startFloor = this.getAttribute("data-floor");
-		pickUp(startFloor, dest, elevCurFloor);
+		var startFloor;
+		var elevatorNumber;
+		if (!elevator1Full && queue.length != 0) {
+			startFloor = queue.pop();
+			elevCurFloor = $(".curFloor1")[0].getAttribute("data-curFloor");
+			elevator1Full = true;
+			elevatorNumber = "curFloor1";
+			pickUp(startFloor, dest, elevCurFloor);
+		} 
+
 	});
 	$(".floor2").click(function() {
-		var elevCurFloor = $(".curFloor1")[0].getAttribute("data-curFloor");
+		queue.push(this.getAttribute("data-floor"));
+		var elevCurFloor;
 		var dest = $(this).val();
-		var startFloor = this.getAttribute("data-floor");
-		pickUp(startFloor, dest, elevCurFloor);
+		var startFloor;
+		var elevatorNumber;
+		if (!elevator1Full && queue.length != 0) {
+			startFloor = queue.pop();
+			elevCurFloor = $(".curFloor1")[0].getAttribute("data-curFloor");
+			elevator1Full = true;
+			elevatorNumber = "curFloor1";
+			pickUp(startFloor, dest, elevCurFloor);
+		} 
 	});
 	$(".floor3").click(function() {
-		var elevCurFloor = $(".curFloor1")[0].getAttribute("data-curFloor");
+		queue.push(this.getAttribute("data-floor"));
+		var elevCurFloor;
 		var dest = $(this).val();
-		var startFloor = this.getAttribute("data-floor");
-		pickUp(startFloor, dest, elevCurFloor);
+		var startFloor;
+		var elevatorNumber;
+		if (!elevator1Full && queue.length != 0) {
+			startFloor = queue.pop();
+			elevCurFloor = $(".curFloor1")[0].getAttribute("data-curFloor");
+			elevator1Full = true;
+			elevatorNumber = "curFloor1";
+			pickUp(startFloor, dest, elevCurFloor);
+		} 
 	});
 	$(".floor4").click(function() {
-		var elevCurFloor = $(".curFloor1")[0].getAttribute("data-curFloor");
+		queue.push(this.getAttribute("data-floor"));
+		var elevCurFloor;
 		var dest = $(this).val();
-		var startFloor = this.getAttribute("data-floor");
-		pickUp(startFloor, dest, elevCurFloor);
+		var startFloor;
+		var elevatorNumber;
+		if (!elevator1Full && queue.length != 0) {
+			startFloor = queue.pop();
+			elevCurFloor = $(".curFloor1")[0].getAttribute("data-curFloor");
+			elevator1Full = true;
+			elevatorNumber = "curFloor1";
+			pickUp(startFloor, dest, elevCurFloor);
+		} 
 	});
 	$(".floor5").click(function() {
-		var elevCurFloor = $(".curFloor1")[0].getAttribute("data-curFloor");
+		queue.push(this.getAttribute("data-floor"));
+		var elevCurFloor;
 		var dest = $(this).val();
-		var startFloor = this.getAttribute("data-floor");
-		pickUp(startFloor, dest, elevCurFloor);
+		var startFloor;
+		var elevatorNumber;
+		if (!elevator1Full && queue.length != 0) {
+			startFloor = queue.pop();
+			elevCurFloor = $(".curFloor1")[0].getAttribute("data-curFloor");
+			elevator1Full = true;
+			elevatorNumber = "curFloor1";
+			pickUp(startFloor, dest, elevCurFloor);
+		} 
 	});
 	$(".floor6").click(function() {
-		var elevCurFloor = $(".curFloor1")[0].getAttribute("data-curFloor");
+		queue.push(this.getAttribute("data-floor"));
+		var elevCurFloor;
 		var dest = $(this).val();
-		var startFloor = this.getAttribute("data-floor");
-		pickUp(startFloor, dest, elevCurFloor);
+		var startFloor;
+		var elevatorNumber;
+		if (!elevator1Full && queue.length != 0) {
+			startFloor = queue.pop();
+			elevCurFloor = $(".curFloor1")[0].getAttribute("data-curFloor");
+			elevator1Full = true;
+			elevatorNumber = "curFloor1";
+			pickUp(startFloor, dest, elevCurFloor);
+		} 
 	});
 	$(".floor7").click(function() {
-		var elevCurFloor = $(".curFloor1")[0].getAttribute("data-curFloor");
+		queue.push(this.getAttribute("data-floor"));
+		var elevCurFloor;
 		var dest = $(this).val();
-		var startFloor = this.getAttribute("data-floor");
-		pickUp(startFloor, dest, elevCurFloor);
+		var startFloor;
+		var elevatorNumber;
+		if (!elevator1Full && queue.length != 0) {
+			startFloor = queue.pop();
+			elevCurFloor = $(".curFloor1")[0].getAttribute("data-curFloor");
+			elevator1Full = true;
+			elevatorNumber = "curFloor1";
+			pickUp(startFloor, dest, elevCurFloor);
+		} 
 	});
 	$(".floor8").click(function() {
-		var elevCurFloor = $(".curFloor1")[0].getAttribute("data-curFloor");
+		queue.push(this.getAttribute("data-floor"));
+		var elevCurFloor;
 		var dest = $(this).val();
-		var startFloor = this.getAttribute("data-floor");
-		pickUp(startFloor, dest, elevCurFloor);
+		var startFloor;
+		var elevatorNumber;
+		if (!elevator1Full && queue.length != 0) {
+			startFloor = queue.pop();
+			elevCurFloor = $(".curFloor1")[0].getAttribute("data-curFloor");
+			elevator1Full = true;
+			elevatorNumber = "curFloor1";
+			pickUp(startFloor, dest, elevCurFloor);
+		} 
 	});
 	$(".floor9").click(function() {
-		var elevCurFloor = $(".curFloor1")[0].getAttribute("data-curFloor");
+		queue.push(this.getAttribute("data-floor"));
+		var elevCurFloor;
 		var dest = $(this).val();
-		var startFloor = this.getAttribute("data-floor");
-		pickUp(startFloor, dest, elevCurFloor);
+		var startFloor;
+		var elevatorNumber;
+		if (!elevator1Full && queue.length != 0) {
+			startFloor = queue.pop();
+			elevCurFloor = $(".curFloor1")[0].getAttribute("data-curFloor");
+			elevator1Full = true;
+			elevatorNumber = "curFloor1";
+			pickUp(startFloor, dest, elevCurFloor);
+		} 
 	});
 	$(".floor10").click(function() {
-		var elevCurFloor = $(".curFloor1")[0].getAttribute("data-curFloor");
+		queue.push(this.getAttribute("data-floor"));
+		var elevCurFloor;
 		var dest = $(this).val();
-		var startFloor = this.getAttribute("data-floor");
-		pickUp(startFloor, dest, elevCurFloor);
+		var startFloor;
+		var elevatorNumber;
+		if (!elevator1Full && queue.length != 0) {
+			startFloor = queue.pop();
+			elevCurFloor = $(".curFloor1")[0].getAttribute("data-curFloor");
+			elevator1Full = true;
+			elevatorNumber = "curFloor1";
+			pickUp(startFloor, dest, elevCurFloor);
+		} 
 	});
 });
 const sleep = (ms) =>
@@ -82,6 +200,7 @@ async function moveUpDropOff(startFloor, dest, elevCurFloor) {
 	}
 	if (elevCurFloor == dest){
 		setTimeout(arrived(dest), 1000);
+		elevator1Full = false;
 	}
 }
 
@@ -103,6 +222,7 @@ async function moveDownDropOff(startFloor, dest, elevCurFloor) {
 	}
 	if (elevCurFloor == dest){
 		setTimeout(arrived(dest), 1000);
+		elevator1Full = false;
 	}
 }
 
@@ -179,7 +299,6 @@ function pickUp(startFloor, dest, elevCurFloor) {
 
 function arrived(dest) {
 	$("#e1f" + dest).css("background", "black");
-
 }
 
 
