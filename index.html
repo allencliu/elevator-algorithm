@@ -8,7 +8,7 @@
 		<!-- Bootstrap CSS -->
 		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
 		<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
-		<script src="elevator.js?rev=4"></script>
+		<script src="elevator.js?rev=5"></script>
 		<link rel="stylesheet" href="style.css?rev=1">
 		<title>Elevator Simulator</title>
 	</head>
@@ -31,18 +31,18 @@
 				</div>
 
 				<div class="col-2">
-					<div class="border border-3 border-dark m-2 p-2 f10 indicator elevator1" id="e1f10" value=10 data-curFloor=10>
+					<div class="border border-3 border-dark m-2 p-2 f10 indicator elevator1" id="e1f10" value=10 data-curFloor=10 data-id="e1f">
 						Elevator 1 : Floor 10
 					</div>
 				</div>
 				<div class="col-2">
-                                        <div class="border border-3 border-dark m-2 p-2 f10 indicator elevator2" id="e2f10" value=10 data-curFloor=10>
+                                        <div class="border border-3 border-dark m-2 p-2 f10 indicator elevator2" id="e2f10" value=10 data-curFloor=10 data-id="e2f">
                                                 Elevator 2 : Floor 10
                                         </div>
                                 </div>
 
                                 <div class="col-2">
-                                        <div class="border border-3 border-dark m-2 p-2 f10 indicator elevator3" id=e3f10" value=10 data-curFloor=10>
+                                        <div class="border border-3 border-dark m-2 p-2 f10 indicator elevator3" id=e3f10" value=10 data-curFloor=10 data-id="e3f">
                                                 Elevator 3 : Floor 10
                                         </div>
                                 </div>
@@ -66,18 +66,18 @@
 				</div>
 
 				<div class="col-2">
-					<div class="border border-3 border-dark m-2 p-2 f9 indicator elevator1" id="e1f9" value=9 data-curFloor=9>
+					<div class="border border-3 border-dark m-2 p-2 f9 indicator elevator1" id="e1f9" value=9 data-curFloor=9 data-id="e1f">
 						Elevator 1 : Floor 9
 					</div>
 				</div>
 				<div class="col-2">
-                                        <div class="border border-3 border-dark m-2 p-2 f9 indicator elevator2" id="e2f9" value=9 data-curFloor=9>
+                                        <div class="border border-3 border-dark m-2 p-2 f9 indicator elevator2" id="e2f9" value=9 data-curFloor=9 data-id="e2f">
                                                 Elevator 2 : Floor 9
                                         </div>
                                 </div>
 
                                 <div class="col-2">
-                                        <div class="border border-3 border-dark m-2 p-2 f9 indicator elevator3" id="e3f9" value=9 data-curFloor=9>
+                                        <div class="border border-3 border-dark m-2 p-2 f9 indicator elevator3" id="e3f9" value=9 data-curFloor=9 data-id="e3f">
                                                 Elevator 3 : Floor 9
                                         </div>
                                 </div>
@@ -102,18 +102,18 @@
 				</div>
 
 				<div class="col-2">
-					<div class="border border-3 border-dark m-2 p-2 f8 indicator elevator1" id="e1f8" value=8 data-curFloor=8>
+					<div class="border border-3 border-dark m-2 p-2 f8 indicator elevator1" id="e1f8" value=8 data-curFloor=8 data-id="e1f">
 						Elevator 1 : Floor 8
 					</div>
 				</div>
 				<div class="col-2">
-                                        <div class="border border-3 border-dark m-2 p-2 f8 indicator elevator2" id="e2f8" value=8 data-curFloor=8>
+                                        <div class="border border-3 border-dark m-2 p-2 f8 indicator elevator2" id="e2f8" value=8 data-curFloor=8 data-id="e2f">
                                                 Elevator 2 : Floor 8
                                         </div>
                                 </div>
 
                                 <div class="col-2">
-                                        <div class="border border-3 border-dark m-2 p-2 f8 indicator elevator3" id="e3f8" value=8 data-curFloor=8>
+                                        <div class="border border-3 border-dark m-2 p-2 f8 indicator elevator3" id="e3f8" value=8 data-curFloor=8 data-id="e3f">
                                                 Elevator 3 : Floor 8
                                         </div>
                                 </div>
@@ -137,18 +137,18 @@
 				</div>
 
 				<div class="col-2">
-					<div class="border border-3 border-dark m-2 p-2 f7 indicator elevator1" id="e1f7" value=7 data-curFloor=7>
+					<div class="border border-3 border-dark m-2 p-2 f7 indicator elevator1" id="e1f7" value=7 data-curFloor=7 data-id="e1f">
 						Elevator 1 : Floor 7
 					</div>
 				</div>
 				<div class="col-2">
-                                        <div class="border border-3 border-dark m-2 p-2 f7 indicator elevator2" id="e2f7" value=7 data-curFloor=7>
+                                        <div class="border border-3 border-dark m-2 p-2 f7 indicator elevator2" id="e2f7" value=7 data-curFloor=7 data-id="e2f">
                                                 Elevator 2 : Floor 7
                                         </div>
                                 </div>
 
                                 <div class="col-2">
-                                        <div class="border border-3 border-dark m-2 p-2 f7 indicator elevator3" id="e3f7" value=7 data-curFloor=7>
+                                        <div class="border border-3 border-dark m-2 p-2 f7 indicator elevator3" id="e3f7" value=7 data-curFloor=7 data-id="e3f">
                                                 Elevator 3 : Floor 7
                                         </div>
                                 </div>
@@ -172,18 +172,18 @@
 				</div>
 
 				<div class="col-2">
-					<div class="border border-3 border-dark m-2 p-2 f6 indicator elevator1" id="e1f6" value=6 data-curFloor=6>
+					<div class="border border-3 border-dark m-2 p-2 f6 indicator elevator1" id="e1f6" value=6 data-curFloor=6 data-id="e1f">
 						Elevator 1 : Floor 6
 					</div>
 				</div>
 				<div class="col-2">
-                                        <div class="border border-3 border-dark m-2 p-2 f6 indicator elevator2" id="e2f6" value=6 data-curFloor=6>
+                                        <div class="border border-3 border-dark m-2 p-2 f6 indicator elevator2" id="e2f6" value=6 data-curFloor=6 data-id="e2f">
                                                 Elevator 2 : Floor 6
                                         </div>
                                 </div>
 
                                 <div class="col-2">
-                                        <div class="border border-3 border-dark m-2 p-2 f6 indicator elevator3" id="e3f6" value=6 data-curFloor=6>
+                                        <div class="border border-3 border-dark m-2 p-2 f6 indicator elevator3" id="e3f6" value=6 data-curFloor=6 data-id="e3f">
                                                 Elevator 3 : Floor 6
                                         </div>
                                 </div>
@@ -207,18 +207,18 @@
 				</div>
 
 				<div class="col-2">
-					<div class="border border-3 border-dark m-2 p-2 f5 indicator elevator1" id="e1f5" value=5 data-curFloor=5>  
+					<div class="border border-3 border-dark m-2 p-2 f5 indicator elevator1" id="e1f5" value=5 data-curFloor=5 data-id="e1f">  
 						Elevator 1 : Floor 5
 					</div>
 				</div>
 				<div class="col-2">
-                                        <div class="border border-3 border-dark m-2 p-2 f5 indicator elevator2" id="e2f5" value=5 data-curFloor=5>
+                                        <div class="border border-3 border-dark m-2 p-2 f5 indicator elevator2" id="e2f5" value=5 data-curFloor=5 data-id="e2f">
                                                 Elevator 2 : Floor 5
                                         </div>
                                 </div>
 
                                 <div class="col-2">
-                                        <div class="border border-3 border-dark m-2 p-2 f5 indicator elevator3" id="e3f5" value=5 data-curFloor=5>
+                                        <div class="border border-3 border-dark m-2 p-2 f5 indicator elevator3" id="e3f5" value=5 data-curFloor=5 data-id="e3f">
                                                 Elevator 3 : Floor 5
                                         </div>
                                 </div>
@@ -242,18 +242,18 @@
 				</div>
 
 				<div class="col-2">
-					<div class="border border-3 border-dark m-2 p-2 f4 indicator elevator1" id="e1f4" value=4 data-curFloor=4>
+					<div class="border border-3 border-dark m-2 p-2 f4 indicator elevator1" id="e1f4" value=4 data-curFloor=4 data-id="e1f">
 						Elevator 1 : Floor 4
 					</div>
 				</div>
 				<div class="col-2">
-                                        <div class="border border-3 border-dark m-2 p-2 f4 indicator elevator2" id="e2f4" value=4 data-curFloor=4>
+                                        <div class="border border-3 border-dark m-2 p-2 f4 indicator elevator2" id="e2f4" value=4 data-curFloor=4 data-id="e2f">
                                                 Elevator 2 : Floor 4
                                         </div>
                                 </div>
 
                                 <div class="col-2">
-                                        <div class="border border-3 border-dark m-2 p-2 f4 indicator elevator3" id="e3f4" value=4 data-curFloor=4>
+                                        <div class="border border-3 border-dark m-2 p-2 f4 indicator elevator3" id="e3f4" value=4 data-curFloor=4 data-id="e3f">
                                                 Elevator 3 : Floor 4
                                         </div>
                                 </div>
@@ -278,18 +278,18 @@
 				</div>
 
 				<div class="col-2">
-					<div class="border border-3 border-dark m-2 p-2 f3 indicator elevator1" id="e1f3" value=3 data-curFloor=3>
+					<div class="border border-3 border-dark m-2 p-2 f3 indicator elevator1" id="e1f3" value=3 data-curFloor=3 data-id="e1f">
 						Elevator 1 : Floor 3
 					</div>
 				</div>
 				<div class="col-2">
-                                        <div class="border border-3 border-dark m-2 p-2 f3 indicator elevator2" id="e2f3" value=3 data-curFloor=3>
+                                        <div class="border border-3 border-dark m-2 p-2 f3 indicator elevator2" id="e2f3" value=3 data-curFloor=3 data-id="e2f">
                                                 Elevator 2 : Floor 3
                                         </div>
                                 </div>
 
                                 <div class="col-2">
-                                        <div class="border border-3 border-dark m-2 p-2 f3 indicator elevator3" id="e3f3" value=3 data-curFloor=3>
+                                        <div class="border border-3 border-dark m-2 p-2 f3 indicator elevator3" id="e3f3" value=3 data-curFloor=3 data-id="e3f">
                                                 Elevator 3 : Floor 3
                                         </div>
                                 </div>
@@ -313,18 +313,18 @@
 				</div>
 
 				<div class="col-2">
-					<div class="border border-3 border-dark m-2 p-2 f2 indicator elevator1" id="e1f2" value=2 data-curFloor=2>
+					<div class="border border-3 border-dark m-2 p-2 f2 indicator elevator1" id="e1f2" value=2 data-curFloor=2 data-id="e1f">
 						Elevator 1 : Floor 2
 					</div>
 				</div>
 				<div class="col-2">
-					<div class="border border-3 border-dark m-2 p-2 f2 indicator elevator2" id="e2f2" value=2 data-curFloor=2>
+					<div class="border border-3 border-dark m-2 p-2 f2 indicator elevator2" id="e2f2" value=2 data-curFloor=2 data-id="e2f">
 						Elevator 2 : Floor 2
 					</div>
 				</div>
 
 				<div class="col-2">
-					<div class="border border-3 border-dark m-2 p-2 f2 indicator elevator3" id="e3f2" value=2 data-curFloor=2>
+					<div class="border border-3 border-dark m-2 p-2 f2 indicator elevator3" id="e3f2" value=2 data-curFloor=2 data-id="e3f">
 						Elevator 3 : Floor 2
 					</div>
 				</div>
@@ -349,18 +349,18 @@
 
 
 				<div class="col-2">
-					<div class="border border-3 border-dark m-2 p-2 f1 indicator elevator1 curFloor1" id="e1f1" value=1 data-curFloor=1>
+					<div class="border border-3 border-dark m-2 p-2 f1 indicator elevator1 curFloor1" id="e1f1" value=1 data-curFloor=1 data-id="e1f">
 						Elevator 1 : Floor 1
 					</div>
 				</div>
 				<div class="col-2">
-					<div class="border border-3 border-dark m-2 p-2 f1 indicator elevator2 curFloor2" id="e2f1" value=1 data-curFloor=1>
+					<div class="border border-3 border-dark m-2 p-2 f1 indicator elevator2 curFloor2" id="e2f1" value=1 data-curFloor=1 data-id="e2f">
 						Elevator 2 : Floor 1
 					</div>
 				</div>
 
 				<div class="col-2">
-					<div class="border border-3 border-dark m-2 p-2 f1 indicator elevator3 curFloor3" id="e3f1" value=1 data-curFloor=1>
+					<div class="border border-3 border-dark m-2 p-2 f1 indicator elevator3 curFloor3" id="e3f1" value=1 data-curFloor=1 data-id="e3f">
 						Elevator 3 : Floor 1
 					</div>
 				</div>
