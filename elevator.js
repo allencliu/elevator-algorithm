@@ -48,10 +48,16 @@ class Queue {
 
 
 var queue = new Queue();
+var queue2 = new Queue();
+var queue3 = new Queue();
 var elevator1Full = false;
 var elevator2Full = false;
 var elevator3Full = false;
+var elevator1Moving = false;
+var elevator2Moving = false;
+var elevator3Moving = false;
 $( document ).ready(function() {
+	var firstClick = false;
 	$(".floor1").unbind('click').click(function() {
 		var dest = $(this).val();
 		var startFloor = this.getAttribute("data-floor");	
@@ -124,13 +130,14 @@ $( document ).ready(function() {
 	});
 
 	$(".btn").click(function() {
-		if (!elevator1Full && queue.peek() != null) {
-			pickUp();
-		} else if (!elevator2Full && queue.peek() != null) {
+		if (!elevator1Full && !elevator1Moving && queue.peek() != null) {
+			pickUp("curFloor1");
+		} /*else if (!elevator2Full && queue.peek() != null) {
 			pickUp();
 		} else if (!elevator3Full && queue.peek() != null) {	
 			pickUp();
-		}
+		}*/
+		//	}
 	});
 
 });
@@ -163,13 +170,15 @@ async function moveDownDropOff(startFloor, dest, elevCurFloor, elevID) {
 		elevCurFloor -= 1;
 	}
 	if (elevCurFloor == dest){
-		arrived(dest, elevID)
+		arrived(dest, elevID);
 	}
 }
 
 async function moveUpPickUp(startFloor, dest, elevCurFloor, elevID) {
+	if (elevID === "e1f") {
+		elevator1Moving = true;
+	}
 	while (elevCurFloor < startFloor) {
-		console.log(queue);
 		let nextFloor = elevCurFloor + 1;
 		$("#" + elevID +  nextFloor).css("background", "green");
 		$("#" + elevID + elevCurFloor).removeClass("curFloor1");
@@ -178,10 +187,10 @@ async function moveUpPickUp(startFloor, dest, elevCurFloor, elevID) {
 		await sleep(1000);
 		elevCurFloor += 1;
 	}
-	if (elevCurFloor == startFloor){
+	if (elevCurFloor == startFloor)	{
 		if (startFloor < dest) {
 			$("#" + elevID + startFloor).css("background", "blue");
-			await sleep(1000)
+			await sleep(1000);
 			$("#" + elevID + startFloor).css("background", "grey");
 			moveUpDropOff(Number(startFloor), Number(dest), Number(elevCurFloor), elevID);
 
@@ -189,13 +198,16 @@ async function moveUpPickUp(startFloor, dest, elevCurFloor, elevID) {
 			$("#" + elevID + startFloor).css("background", "blue");
 			await sleep(1000);
 			$("#" + elevID + startFloor).css("background", "grey");
-			moveDownDropOff(Number(startFloor), Number(dest), Number(elevCurFloor), elevID)
+			moveDownDropOff(Number(startFloor), Number(dest), Number(elevCurFloor), elevID);
 		}
 	}
 }
 
 
 async function moveDownPickUp(startFloor, dest, elevCurFloor, elevID) {
+	if (elevID === "e1f") {
+		elevator1Moving = true;
+	}
 	while (elevCurFloor > startFloor) {
 		let nextFloor = elevCurFloor - 1;
 		$("#" + elevID + nextFloor).css("background", "green");
@@ -205,10 +217,10 @@ async function moveDownPickUp(startFloor, dest, elevCurFloor, elevID) {
 		await sleep(1000);
 		elevCurFloor -= 1;
 	}
-	if (elevCurFloor == startFloor){
+	if (elevCurFloor == startFloor)	{
 		if (startFloor < dest) {
 			$("#" + elevID + startFloor).css("background", "blue");
-			await sleep(1000)
+			await sleep(1000);
 			$("#" + elevID + startFloor).css("background", "grey");
 			moveUpDropOff(Number(startFloor), Number(dest), Number(elevCurFloor), elevID);
 
@@ -216,28 +228,34 @@ async function moveDownPickUp(startFloor, dest, elevCurFloor, elevID) {
 			$("#" + elevID + startFloor).css("background", "blue");
 			await sleep(1000);
 			$("#" + elevID + startFloor).css("background", "grey");
-			moveDownDropOff(Number(startFloor), Number(dest), Number(elevCurFloor), elevID)
+			moveDownDropOff(Number(startFloor), Number(dest), Number(elevCurFloor), elevID);
 		}
 	}
 }
 
 
-async function pickUp() {
-	if (!elevator1Full && queue.peek() != null) {
+async function pickUp(curFloorClass) {
+	if (curFloorClass == "curFloor1") {
 		var p = queue.poll();
-		var startFloor = p.getStartFloor();
-		var dest = p.getDest();
-		var elevCurFloor = $(".curFloor1")[0].getAttribute("data-curFloor")
-		var elevID = $(".curFloor1")[0].getAttribute("data-id")
-		elevator1Full = true;
+		var startFloor = parseInt(p.getStartFloor());
+		var dest = parseInt(p.getDest());
+		var elevCurFloor = parseInt($("." + curFloorClass)[0].getAttribute("data-curFloor"));
+		var elevID = $("." + curFloorClass)[0].getAttribute("data-id");
+		console.log("Elevator Current FLoor: " + elevCurFloor);
+		console.log("Starting floor: " + startFloor);
+		console.log("Type of elevCurFloor: " + typeof(elevCurFloor));
+		console.log("Type of dest: " + typeof(dest));
+		console.log("Type of startFloor: " + typeof(startFloor));
 		if (startFloor > elevCurFloor) {
-			moveUpPickUp(Number(startFloor), Number(dest),  Number(elevCurFloor), elevID);
+			console.log("If state: Elevator Current FLoor: " + elevCurFloor);
+			console.log("If starting floor: " + startFloor);
+			moveUpPickUp(Number(startFloor), Number(dest), Number(elevCurFloor), elevID);
 		} else if (startFloor < elevCurFloor) { 
 			moveDownPickUp(Number(startFloor), Number(dest), Number(elevCurFloor), elevID);
 		} else {
 			if (startFloor < dest) {
 				$("#" + elevID + startFloor).css("background", "blue");
-				await sleep(1000)
+				await sleep(1000);
 				$("#" + elevID + startFloor).css("background", "grey");
 				moveUpDropOff(Number(startFloor), Number(dest), Number(elevCurFloor), elevID);
 
@@ -245,10 +263,10 @@ async function pickUp() {
 				$("#" + elevID + startFloor).css("background", "blue");
 				await sleep(1000);
 				$("#" + elevID + startFloor).css("background", "grey");
-				moveDownDropOff(Number(startFloor), Number(dest), Number(elevCurFloor), elevID)
+				moveDownDropOff(Number(startFloor), Number(dest), Number(elevCurFloor), elevID);
 			}
 		}
-	} else if (!elevator2Full && queue.peek() != null) {
+	} /*else if (!elevator2Full && queue.peek() != null) {
 		var p = queue.poll();
 		var startFloor = p.getStartFloor();
 		var dest = p.getDest();
@@ -300,18 +318,25 @@ async function pickUp() {
 			}
 		}
 
-	}
+	}*/
 }
 
 async function arrived(dest, elevID) {
 	if (elevID === "e1f") {
 		$("#" + elevID + dest).css("background", "black");
+		elevator1Moving = false;
 		elevator1Full = false;
-		if (!elevator1Full && queue.peek() != null) {
+		if (queue.peek() != null) {
 			await sleep(1000);
+			pickUp("curFloor1");
+			/*else if (!elevator2Full && queue.peek() != null) {
 			pickUp();
+		} else if (!elevator3Full && queue.peek() != null) {	
+			pickUp();
+		}*/
+
 		}
-	} else if (elevID === "e2f") {
+	}/* else if (elevID === "e2f") {
 		$("#" + elevID + dest).css("background", "black");
 		elevator2Full = false;
 		await sleep(1000);
@@ -326,7 +351,7 @@ async function arrived(dest, elevID) {
 			pickUp();
 		}
 
-	}
+	}*/
 
 }
 
