@@ -203,7 +203,6 @@ async function moveUpPickUp(startFloor, dest, elevCurFloor, elevID, curFloorClas
 	}
 }
 
-
 async function moveDownPickUp(startFloor, dest, elevCurFloor, elevID, curFloorClass) {
 	if (elevID === "e1f") {
 		elevator1Moving = true;
@@ -232,7 +231,6 @@ async function moveDownPickUp(startFloor, dest, elevCurFloor, elevID, curFloorCl
 		}
 	}
 }
-
 
 async function pickUp(curFloorClass) {
 	if (curFloorClass == "curFloor1") {
