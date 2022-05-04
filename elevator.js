@@ -1,7 +1,8 @@
 class Passenger {
-	constructor(dest, startFloor) {
+	constructor(dest, startFloor, button) {
 		this.dest = dest;
 		this.startFloor = startFloor;
+		this.button = button;
 	}
 
 	getDest(){
@@ -12,6 +13,10 @@ class Passenger {
 		return this.startFloor;
 	}
 
+	getButton() {
+		return this.button;
+	}
+
 }
 
 class Queue {
@@ -19,17 +24,20 @@ class Queue {
 		this.elements = {};
 		this.head = 0;
 		this.tail = 0;
+		this.length = 0;
 	}
 
 	push(element) {
 		this.elements[this.tail] = element;
 		this.tail++;
+		this.length++;
 	}
 
 	poll() {
 		const item = this.elements[this.head];
 		delete this.elements[this.head];
 		this.head++;
+		this.length--;
 		return item;
 	}
 
@@ -37,322 +45,459 @@ class Queue {
 		return this.elements[this.head];
 	}
 
-	length() {
-		return this.tail - this.head;
+	size() {
+		return this.length;
 	}
 
 	isEmpty() {
-		return this.length === 0;
+		return this.length == 0;
 	}
 }
 
+const sleep = (ms) =>
+	new Promise(resolve => setTimeout(resolve, ms));
+class Elevator {
+	constructor(elevID, curFloorClass) {
+		this.button;
+		this.elevatorFull = false;
+		this.elevatorMoving = false;
+		this.queue = new Queue();
+		this.elevID = elevID;
+		this.curFloorClass = curFloorClass;
+	}
+	async moveUpDropOff(startFloor, dest, elevCurFloor) {
+		this.elevatorMoving = true;
+		while (elevCurFloor < dest) {
+			let nextFloor = elevCurFloor + 1;
+			$("#" + this.elevID + nextFloor).css("background", "green");
+			$("#" + this.elevID + elevCurFloor).removeClass(this.curFloorClass);
+			$("#" + this.elevID + nextFloor).addClass(this.curFloorClass);
+			$("#" + this.elevID + elevCurFloor).css("background", "grey");
+			await sleep(1000);
+			elevCurFloor+=1;
+		}
+		if (elevCurFloor == dest){
+			this.arrived(dest);
+		}
+	}
 
-var queue1 = new Queue();
-var queue2 = new Queue();
-var queue3 = new Queue();
-var elevator1Full = false;
-var elevator2Full = false;
-var elevator3Full = false;
-var elevator1Moving = false;
-var elevator2Moving = false;
-var elevator3Moving = false;
+	async moveDownDropOff(startFloor, dest, elevCurFloor) {
+		this.elevatorMoving = true;
+		while (elevCurFloor > dest) {
+			let nextFloor = elevCurFloor - 1;
+			$("#" + this.elevID + nextFloor).css("background", "green");
+			$("#" + this.elevID + elevCurFloor).removeClass(this.curFloorClass);
+			$("#" + this.elevID + nextFloor).addClass(this.curFloorClass);
+			$("#" + this.elevID + elevCurFloor).css("background", "grey");
+			await sleep(1000);
+			elevCurFloor -= 1;
+		}
+		if (elevCurFloor == dest){
+			this.arrived(dest);
+		}
+	}
+
+	async moveUpPickUp(startFloor, dest, elevCurFloor, button) {
+		this.elevatorMoving = true;
+		while (elevCurFloor < startFloor) {
+			let nextFloor = elevCurFloor + 1;
+			$("#" + this.elevID +  nextFloor).css("background", "green");
+			$("#" + this.elevID + elevCurFloor).removeClass(this.curFloorClass);
+			$("#" + this.elevID + nextFloor).addClass(this.curFloorClass);
+			$("#" + this.elevID + elevCurFloor).css("background", "grey");
+			await sleep(1000);
+			elevCurFloor += 1;
+		}
+		if (elevCurFloor == startFloor)	{
+			$(button).css("background-color", "#212529");
+			this.elevatorFull = true;
+			if (startFloor < dest) {
+				$("#" + this.elevID + startFloor).css("background", "blue");
+				await sleep(1000);
+				$("#" + this.elevID + startFloor).css("background", "grey");
+				this.moveUpDropOff(startFloor, dest, elevCurFloor);
+
+			} else if (startFloor > dest) {
+				$("#" + this.elevID + startFloor).css("background", "blue");
+				await sleep(1000);
+				$("#" + this.elevID + startFloor).css("background", "grey");
+				this.moveDownDropOff(startFloor, dest, elevCurFloor);
+			}
+		}
+	}
+
+
+	async moveDownPickUp(startFloor, dest, elevCurFloor, button) {
+		this.elevatorMoving = true;
+		while (elevCurFloor > startFloor) {
+			let nextFloor = elevCurFloor - 1;
+			$("#" + this.elevID + nextFloor).css("background", "green");
+			$("#" + this.elevID + elevCurFloor).removeClass(this.curFloorClass);
+			$("#" + this.elevID + nextFloor).addClass(this.curFloorClass);
+			$("#" + this.elevID + elevCurFloor).css("background", "grey");
+			await sleep(1000);
+			elevCurFloor -= 1;
+		}
+		if (elevCurFloor == startFloor)	{
+			$(button).css("background-color", "#212529");
+			this.elevatorFull = true;
+			if (startFloor < dest) {
+				$("#" + this.elevID + startFloor).css("background", "blue");
+				await sleep(1000);
+				$("#" + this.elevID + startFloor).css("background", "grey");
+				this.moveUpDropOff(startFloor, dest, elevCurFloor);
+
+			} else if (startFloor > dest) {
+				$("#" + this.elevID + startFloor).css("background", "blue");
+				await sleep(1000);
+				$("#" + this.elevID + startFloor).css("background", "grey");
+				this.moveDownDropOff(startFloor, dest, elevCurFloor);
+			}
+		}
+	}
+
+
+	async pickUp() {
+		var p = this.queue.poll();
+		console.log(p);
+		var startFloor = parseInt(p.getStartFloor());
+		var dest = parseInt(p.getDest());
+		var elevCurFloor = parseInt($("." + this.curFloorClass)[0].getAttribute("data-curFloor"));
+		var button = p.getButton();
+		if (startFloor > elevCurFloor) {
+			this.moveUpPickUp(startFloor, dest, elevCurFloor, button);
+		} else if (startFloor < elevCurFloor) { 
+			this.moveDownPickUp(startFloor, dest, elevCurFloor, button);
+		} else {
+			await sleep(1000);
+			$(button).css("background-color", "#212529");
+			this.elevatorFull = true;
+			if (startFloor < dest) {
+				$("#" + this.elevID + startFloor).css("background", "blue");
+				await sleep(1000);
+				$("#" + this.elevID + startFloor).css("background", "grey");
+				this.moveUpDropOff(startFloor, dest, elevCurFloor);
+
+			} else if (startFloor > dest) {
+				$("#" + this.elevID + startFloor).css("background", "blue");
+				await sleep(1000);
+				$("#" + this.elevID + startFloor).css("background", "grey");
+				this.moveDownDropOff(startFloor, dest, elevCurFloor);
+			}
+		}
+	}
+
+	async arrived(dest) {
+		$("#" + this.elevID + dest).css("background", "black");
+		this.elevatorMoving = false;
+		this.elevatorFull = false;
+		if (!this.queue.isEmpty()) {
+			await sleep(1000);
+			this.pickUp();
+		}
+	}
+
+	isFull() {
+		return this.elevatorFull;
+	}
+
+	isMoving() {
+		return this.elevatorMoving;
+	}
+
+	getQueue() {
+		return this.queue;
+	}
+}
+
+var elevator1 = new Elevator("e1f", "curFloor1");
+var elevator2 = new Elevator("e2f", "curFloor2");
+var elevator3 = new Elevator("e3f", "curFloor3");
 $( document ).ready(function() {
-	var firstClick = false;
 	$(".floor1").unbind('click').click(function() {
+		var button = this;
 		var dest = $(this).val();
 		var startFloor = this.getAttribute("data-floor");	
 		if (dest != '' && startFloor != null) {
-			queue1.push(new Passenger(dest, startFloor));
+			let q1Size = elevator1.getQueue().size();
+			let q2Size = elevator2.getQueue().size();
+			let q3Size = elevator3.getQueue().size();
+			if (elevator1.getQueue().isEmpty() && !elevator1.isFull() && !elevator1.isMoving()) {
+				elevator1.getQueue().push(new Passenger(dest, startFloor, button));
+			} else if (elevator2.getQueue().isEmpty() && !elevator2.isFull()  && !elevator2.isMoving()) {
+				elevator2.getQueue().push(new Passenger(dest, startFloor, button));
+			} 
+			else if (elevator3.getQueue().isEmpty() && !elevator3.isFull()  && !elevator3.isMoving()) {
+				elevator3.getQueue().push(new Passenger(dest, startFloor, button));
+			} else {
+				let min = Math.min(q1Size, Math.min(q2Size, q3Size));
+				if (min == q1Size) {
+					elevator1.getQueue().push(new Passenger(dest, startFloor, button));
+				} else if (min == q2Size) {
+					elevator2.getQueue().push(new Passenger(dest, startFloor, button));
+				} else if (min == q3Size) {
+					elevator3.getQueue().push(new Passenger(dest, startFloor, button));
+				}
+			}
 		}
 	});
 	$(".floor2").unbind('click').click(function() {
+		var button = this;
 		var dest = $(this).val();
-		var startFloor = this.getAttribute("data-floor");
+		var startFloor = this.getAttribute("data-floor");	
 		if (dest != '' && startFloor != null) {
-			queue1.push(new Passenger(dest, startFloor));
+			let q1Size = elevator1.getQueue().size();
+			let q2Size = elevator2.getQueue().size();
+			let q3Size = elevator3.getQueue().size();
+			if (elevator1.getQueue().isEmpty() && !elevator1.isFull() && !elevator1.isMoving()) {
+				elevator1.getQueue().push(new Passenger(dest, startFloor, button));
+			} else if (elevator2.getQueue().isEmpty() && !elevator2.isFull()  && !elevator2.isMoving()) {
+				elevator2.getQueue().push(new Passenger(dest, startFloor, button));
+			} 
+			else if (elevator3.getQueue().isEmpty() && !elevator3.isFull()  && !elevator3.isMoving()) {
+				elevator3.getQueue().push(new Passenger(dest, startFloor, button));
+			} else {
+				let min = Math.min(q1Size, Math.min(q2Size, q3Size));
+				if (min == q1Size) {
+					elevator1.getQueue().push(new Passenger(dest, startFloor, button));
+				} else if (min == q2Size) {
+					elevator2.getQueue().push(new Passenger(dest, startFloor, button));
+				} else if (min == q3Size) {
+					elevator3.getQueue().push(new Passenger(dest, startFloor, button));
+				}
+			}
 		}
 	});
 	$(".floor3").unbind('click').click(function() {
+		var button = this;
 		var dest = $(this).val();
-		var startFloor = this.getAttribute("data-floor");
+		var startFloor = this.getAttribute("data-floor");	
 		if (dest != '' && startFloor != null) {
-			queue1.push(new Passenger(dest, startFloor));
+			let q1Size = elevator1.getQueue().size();
+			let q2Size = elevator2.getQueue().size();
+			let q3Size = elevator3.getQueue().size();
+			if (elevator1.getQueue().isEmpty() && !elevator1.isFull() && !elevator1.isMoving()) {
+				elevator1.getQueue().push(new Passenger(dest, startFloor, button));
+			} else if (elevator2.getQueue().isEmpty() && !elevator2.isFull()  && !elevator2.isMoving()) {
+				elevator2.getQueue().push(new Passenger(dest, startFloor, button));
+			} 
+			else if (elevator3.getQueue().isEmpty() && !elevator3.isFull()  && !elevator3.isMoving()) {
+				elevator3.getQueue().push(new Passenger(dest, startFloor, button));
+			} else {
+				let min = Math.min(q1Size, Math.min(q2Size, q3Size));
+				if (min == q1Size) {
+					elevator1.getQueue().push(new Passenger(dest, startFloor, button));
+				} else if (min == q2Size) {
+					elevator2.getQueue().push(new Passenger(dest, startFloor, button));
+				} else if (min == q3Size) {
+					elevator3.getQueue().push(new Passenger(dest, startFloor, button));
+				}
+			}
 		}
 	});
 	$(".floor4").unbind('click').click(function() {
+		var button = this;
 		var dest = $(this).val();
-		var startFloor = this.getAttribute("data-floor");
+		var startFloor = this.getAttribute("data-floor");	
 		if (dest != '' && startFloor != null) {
-			queue1.push(new Passenger(dest, startFloor));
+			let q1Size = elevator1.getQueue().size();
+			let q2Size = elevator2.getQueue().size();
+			let q3Size = elevator3.getQueue().size();
+			if (elevator1.getQueue().isEmpty() && !elevator1.isFull() && !elevator1.isMoving()) {
+				elevator1.getQueue().push(new Passenger(dest, startFloor, button));
+			} else if (elevator2.getQueue().isEmpty() && !elevator2.isFull()  && !elevator2.isMoving()) {
+				elevator2.getQueue().push(new Passenger(dest, startFloor, button));
+			} 
+			else if (elevator3.getQueue().isEmpty() && !elevator3.isFull()  && !elevator3.isMoving()) {
+				elevator3.getQueue().push(new Passenger(dest, startFloor, button));
+			} else {
+				let min = Math.min(q1Size, Math.min(q2Size, q3Size));
+				if (min == q1Size) {
+					elevator1.getQueue().push(new Passenger(dest, startFloor, button));
+				} else if (min == q2Size) {
+					elevator2.getQueue().push(new Passenger(dest, startFloor, button));
+				} else if (min == q3Size) {
+					elevator3.getQueue().push(new Passenger(dest, startFloor, button));
+				}
+			}
 		}
 	});
 	$(".floor5").unbind('click').click(function() {
+		var button = this;
 		var dest = $(this).val();
-		var startFloor = this.getAttribute("data-floor");
+		var startFloor = this.getAttribute("data-floor");	
 		if (dest != '' && startFloor != null) {
-			queue1.push(new Passenger(dest, startFloor));
+			let q1Size = elevator1.getQueue().size();
+			let q2Size = elevator2.getQueue().size();
+			let q3Size = elevator3.getQueue().size();
+			if (elevator1.getQueue().isEmpty() && !elevator1.isFull() && !elevator1.isMoving()) {
+				elevator1.getQueue().push(new Passenger(dest, startFloor, button));
+			} else if (elevator2.getQueue().isEmpty() && !elevator2.isFull()  && !elevator2.isMoving()) {
+				elevator2.getQueue().push(new Passenger(dest, startFloor, button));
+			} 
+			else if (elevator3.getQueue().isEmpty() && !elevator3.isFull()  && !elevator3.isMoving()) {
+				elevator3.getQueue().push(new Passenger(dest, startFloor, button));
+			} else {
+				let min = Math.min(q1Size, Math.min(q2Size, q3Size));
+				if (min == q1Size) {
+					elevator1.getQueue().push(new Passenger(dest, startFloor, button));
+				} else if (min == q2Size) {
+					elevator2.getQueue().push(new Passenger(dest, startFloor, button));
+				} else if (min == q3Size) {
+					elevator3.getQueue().push(new Passenger(dest, startFloor, button));
+				}
+			}
 		}
 	});
 	$(".floor6").unbind('click').click(function() {
+		var button = this;
 		var dest = $(this).val();
-		var startFloor = this.getAttribute("data-floor");
+		var startFloor = this.getAttribute("data-floor");	
 		if (dest != '' && startFloor != null) {
-			queue1.push(new Passenger(dest, startFloor));
+			let q1Size = elevator1.getQueue().size();
+			let q2Size = elevator2.getQueue().size();
+			let q3Size = elevator3.getQueue().size();
+			if (elevator1.getQueue().isEmpty() && !elevator1.isFull() && !elevator1.isMoving()) {
+				elevator1.getQueue().push(new Passenger(dest, startFloor, button));
+			} else if (elevator2.getQueue().isEmpty() && !elevator2.isFull()  && !elevator2.isMoving()) {
+				elevator2.getQueue().push(new Passenger(dest, startFloor, button));
+			} 
+			else if (elevator3.getQueue().isEmpty() && !elevator3.isFull()  && !elevator3.isMoving()) {
+				elevator3.getQueue().push(new Passenger(dest, startFloor, button));
+			} else {
+				let min = Math.min(q1Size, Math.min(q2Size, q3Size));
+				if (min == q1Size) {
+					elevator1.getQueue().push(new Passenger(dest, startFloor, button));
+				} else if (min == q2Size) {
+					elevator2.getQueue().push(new Passenger(dest, startFloor, button));
+				} else if (min == q3Size) {
+					elevator3.getQueue().push(new Passenger(dest, startFloor, button));
+				}
+			}
 		}
 	});
 	$(".floor7").unbind('click').click(function() {
+		var button = this;
 		var dest = $(this).val();
-		var startFloor = this.getAttribute("data-floor");
+		var startFloor = this.getAttribute("data-floor");	
 		if (dest != '' && startFloor != null) {
-			queue1.push(new Passenger(dest, startFloor));
+			let q1Size = elevator1.getQueue().size();
+			let q2Size = elevator2.getQueue().size();
+			let q3Size = elevator3.getQueue().size();
+			if (elevator1.getQueue().isEmpty() && !elevator1.isFull() && !elevator1.isMoving()) {
+				elevator1.getQueue().push(new Passenger(dest, startFloor, button));
+			} else if (elevator2.getQueue().isEmpty() && !elevator2.isFull()  && !elevator2.isMoving()) {
+				elevator2.getQueue().push(new Passenger(dest, startFloor, button));
+			} 
+			else if (elevator3.getQueue().isEmpty() && !elevator3.isFull()  && !elevator3.isMoving()) {
+				elevator3.getQueue().push(new Passenger(dest, startFloor, button));
+			} else {
+				let min = Math.min(q1Size, Math.min(q2Size, q3Size));
+				if (min == q1Size) {
+					elevator1.getQueue().push(new Passenger(dest, startFloor, button));
+				} else if (min == q2Size) {
+					elevator2.getQueue().push(new Passenger(dest, startFloor, button));
+				} else if (min == q3Size) {
+					elevator3.getQueue().push(new Passenger(dest, startFloor, button));
+				}
+			}
 		}
 	});
 	$(".floor8").unbind('click').click(function() {
+		var button = this;
 		var dest = $(this).val();
-		var startFloor = this.getAttribute("data-floor");
+		var startFloor = this.getAttribute("data-floor");	
 		if (dest != '' && startFloor != null) {
-			queue1.push(new Passenger(dest, startFloor));
+			let q1Size = elevator1.getQueue().size();
+			let q2Size = elevator2.getQueue().size();
+			let q3Size = elevator3.getQueue().size();
+			if (elevator1.getQueue().isEmpty() && !elevator1.isFull() && !elevator1.isMoving()) {
+				elevator1.getQueue().push(new Passenger(dest, startFloor, button));
+			} else if (elevator2.getQueue().isEmpty() && !elevator2.isFull()  && !elevator2.isMoving()) {
+				elevator2.getQueue().push(new Passenger(dest, startFloor, button));
+			} 
+			else if (elevator3.getQueue().isEmpty() && !elevator3.isFull()  && !elevator3.isMoving()) {
+				elevator3.getQueue().push(new Passenger(dest, startFloor, button));
+			} else {
+				let min = Math.min(q1Size, Math.min(q2Size, q3Size));
+				if (min == q1Size) {
+					elevator1.getQueue().push(new Passenger(dest, startFloor, button));
+				} else if (min == q2Size) {
+					elevator2.getQueue().push(new Passenger(dest, startFloor, button));
+				} else if (min == q3Size) {
+					elevator3.getQueue().push(new Passenger(dest, startFloor, button));
+				}
+			}
 		}
 	});
 	$(".floor9").unbind('click').click(function() {
+		var button = this;
 		var dest = $(this).val();
-		var startFloor = this.getAttribute("data-floor");
+		var startFloor = this.getAttribute("data-floor");	
 		if (dest != '' && startFloor != null) {
-			queue1.push(new Passenger(dest, startFloor));
+			let q1Size = elevator1.getQueue().size();
+			let q2Size = elevator2.getQueue().size();
+			let q3Size = elevator3.getQueue().size();
+			if (elevator1.getQueue().isEmpty() && !elevator1.isFull() && !elevator1.isMoving()) {
+				elevator1.getQueue().push(new Passenger(dest, startFloor, button));
+			} else if (elevator2.getQueue().isEmpty() && !elevator2.isFull()  && !elevator2.isMoving()) {
+				elevator2.getQueue().push(new Passenger(dest, startFloor, button));
+			} 
+			else if (elevator3.getQueue().isEmpty() && !elevator3.isFull()  && !elevator3.isMoving()) {
+				elevator3.getQueue().push(new Passenger(dest, startFloor, button));
+			} else {
+				let min = Math.min(q1Size, Math.min(q2Size, q3Size));
+				if (min == q1Size) {
+					elevator1.getQueue().push(new Passenger(dest, startFloor, button));
+				} else if (min == q2Size) {
+					elevator2.getQueue().push(new Passenger(dest, startFloor, button));
+				} else if (min == q3Size) {
+					elevator3.getQueue().push(new Passenger(dest, startFloor, button));
+				}
+			}
 		}
 	});
 	$(".floor10").unbind('click').click(function() {
+		var button = this;
 		var dest = $(this).val();
-		var startFloor = this.getAttribute("data-floor");
+		var startFloor = this.getAttribute("data-floor");	
 		if (dest != '' && startFloor != null) {
-			queue1.push(new Passenger(dest, startFloor));
+			let q1Size = elevator1.getQueue().size();
+			let q2Size = elevator2.getQueue().size();
+			let q3Size = elevator3.getQueue().size();
+			if (elevator1.getQueue().isEmpty() && !elevator1.isFull() && !elevator1.isMoving()) {
+				elevator1.getQueue().push(new Passenger(dest, startFloor, button));
+			} else if (elevator2.getQueue().isEmpty() && !elevator2.isFull()  && !elevator2.isMoving()) {
+				elevator2.getQueue().push(new Passenger(dest, startFloor, button));
+			} 
+			else if (elevator3.getQueue().isEmpty() && !elevator3.isFull()  && !elevator3.isMoving()) {
+				elevator3.getQueue().push(new Passenger(dest, startFloor, button));
+			} else {
+				let min = Math.min(q1Size, Math.min(q2Size, q3Size));
+				if (min == q1Size) {
+					elevator1.getQueue().push(new Passenger(dest, startFloor, button));
+				} else if (min == q2Size) {
+					elevator2.getQueue().push(new Passenger(dest, startFloor, button));
+				} else if (min == q3Size) {
+					elevator3.getQueue().push(new Passenger(dest, startFloor, button));
+				}
+			}
 		}
 	});
 
 	$(".btn").click(function() {
-		if (!elevator1Full && !elevator1Moving && queue1.peek() != null) {
-			pickUp("curFloor1");
-		} /*else if (!elevator2Full && queue.peek() != null) {
-			pickUp();
-		} else if (!elevator3Full && queue.peek() != null) {	
-			pickUp();
-		}*/
-		//	}
+		var button = this;
+		$(button).css("background-color", "grey");
+		if (!elevator1.isFull() && !elevator1.isMoving() && elevator1.getQueue().peek() != null) {
+			elevator1.pickUp();
+		} else if (!elevator2.isFull() && !elevator2.isMoving() && elevator2.getQueue().peek() != null) {
+			elevator2.pickUp();
+		} else if (!elevator3.isFull() && !elevator3.isMoving() && elevator3.getQueue().peek() != null) {
+			elevator3.pickUp();
+		}
 	});
 
 });
-const sleep = (ms) =>
-	new Promise(resolve => setTimeout(resolve, ms));
-
-async function moveUpDropOff(startFloor, dest, elevCurFloor, elevID, curFloorClass) {
-	while (elevCurFloor < dest) {
-		let nextFloor = elevCurFloor + 1;
-		$("#" + elevID + nextFloor).css("background", "green");
-		$("#" + elevID + elevCurFloor).removeClass(curFloorClass);
-		$("#" + elevID + nextFloor).addClass(curFloorClass);
-		$("#" + elevID + elevCurFloor).css("background", "grey");
-		await sleep(1000);
-		elevCurFloor+=1;
-	}
-	if (elevCurFloor == dest){
-		arrived(dest, elevID);
-	}
-}
-
-async function moveDownDropOff(startFloor, dest, elevCurFloor, elevID, curFloorClass) {
-	while (elevCurFloor > dest) {
-		let nextFloor = elevCurFloor - 1;
-		$("#" + elevID + nextFloor).css("background", "green");
-		$("#" + elevID + elevCurFloor).removeClass(curFloorClass);
-		$("#" + elevID + nextFloor).addClass(curFloorClass);
-		$("#" + elevID + elevCurFloor).css("background", "grey");
-		await sleep(1000);
-		elevCurFloor -= 1;
-	}
-	if (elevCurFloor == dest){
-		arrived(dest, elevID);
-	}
-}
-
-async function moveUpPickUp(startFloor, dest, elevCurFloor, elevID, curFloorClass) {
-	if (elevID === "e1f") {
-		elevator1Moving = true;
-	}
-	while (elevCurFloor < startFloor) {
-		let nextFloor = elevCurFloor + 1;
-		$("#" + elevID +  nextFloor).css("background", "green");
-		$("#" + elevID + elevCurFloor).removeClass(curFloorClass);
-		$("#" + elevID + nextFloor).addClass(curFloorClass);
-		$("#" + elevID + elevCurFloor).css("background", "grey");
-		await sleep(1000);
-		elevCurFloor += 1;
-	}
-	if (elevCurFloor == startFloor)	{
-		if (startFloor < dest) {
-			$("#" + elevID + startFloor).css("background", "blue");
-			await sleep(1000);
-			$("#" + elevID + startFloor).css("background", "grey");
-			moveUpDropOff(Number(startFloor), Number(dest), Number(elevCurFloor), elevID, curFloorClass);
-
-		} else if (startFloor > dest) {
-			$("#" + elevID + startFloor).css("background", "blue");
-			await sleep(1000);
-			$("#" + elevID + startFloor).css("background", "grey");
-			moveDownDropOff(Number(startFloor), Number(dest), Number(elevCurFloor), elevID, curFloorClass);
-		}
-	}
-}
-
-async function moveDownPickUp(startFloor, dest, elevCurFloor, elevID, curFloorClass) {
-	if (elevID === "e1f") {
-		elevator1Moving = true;
-	}
-	while (elevCurFloor > startFloor) {
-		let nextFloor = elevCurFloor - 1;
-		$("#" + elevID + nextFloor).css("background", "green");
-		$("#" + elevID + elevCurFloor).removeClass("" + curFloorClass);
-		$("#" + elevID + nextFloor).addClass("" + curFloorClass);
-		$("#" + elevID + elevCurFloor).css("background", "grey");
-		await sleep(1000);
-		elevCurFloor -= 1;
-	}
-	if (elevCurFloor == startFloor)	{
-		if (startFloor < dest) {
-			$("#" + elevID + startFloor).css("background", "blue");
-			await sleep(1000);
-			$("#" + elevID + startFloor).css("background", "grey");
-			moveUpDropOff(Number(startFloor), Number(dest), Number(elevCurFloor), elevID, curFloorClass);
-
-		} else if (startFloor > dest) {
-			$("#" + elevID + startFloor).css("background", "blue");
-			await sleep(1000);
-			$("#" + elevID + startFloor).css("background", "grey");
-			moveDownDropOff(Number(startFloor), Number(dest), Number(elevCurFloor), elevID, curFloorClass);
-		}
-	}
-}
-
-async function pickUp(curFloorClass) {
-	if (curFloorClass == "curFloor1") {
-		var p = queue1.poll();
-		var startFloor = parseInt(p.getStartFloor());
-		var dest = parseInt(p.getDest());
-		var elevCurFloor = parseInt($("." + curFloorClass)[0].getAttribute("data-curFloor"));
-		var elevID = $("." + curFloorClass)[0].getAttribute("data-id");
-		console.log("Elevator Current FLoor: " + elevCurFloor);
-		console.log("Starting floor: " + startFloor);
-		console.log("Type of elevCurFloor: " + typeof(elevCurFloor));
-		console.log("Type of dest: " + typeof(dest));
-		console.log("Type of startFloor: " + typeof(startFloor));
-		if (startFloor > elevCurFloor) {
-			console.log("If state: Elevator Current FLoor: " + elevCurFloor);
-			console.log("If starting floor: " + startFloor);
-			moveUpPickUp(Number(startFloor), Number(dest), Number(elevCurFloor), elevID, curFloorClass);
-		} else if (startFloor < elevCurFloor) { 
-			moveDownPickUp(Number(startFloor), Number(dest), Number(elevCurFloor), elevID, curFloorClass);
-		} else {
-			if (startFloor < dest) {
-				$("#" + elevID + startFloor).css("background", "blue");
-				await sleep(1000);
-				$("#" + elevID + startFloor).css("background", "grey");
-				moveUpDropOff(Number(startFloor), Number(dest), Number(elevCurFloor), elevID, curFloorClass);
-
-			} else if (startFloor > dest) {
-				$("#" + elevID + startFloor).css("background", "blue");
-				await sleep(1000);
-				$("#" + elevID + startFloor).css("background", "grey");
-				moveDownDropOff(Number(startFloor), Number(dest), Number(elevCurFloor), elevID, curFloorClass);
-			}
-		}
-	} /*else if (!elevator2Full && queue.peek() != null) {
-		var p = queue.poll();
-		var startFloor = p.getStartFloor();
-		var dest = p.getDest();
-		var elevCurFloor = $(".curFloor2")[0].getAttribute("data-curFloor")
-		var elevID = $(".curFloor2")[0].getAttribute("data-id")
-		elevator2Full = true;
-		if (startFloor > elevCurFloor) {
-			moveUpPickUp(Number(startFloor), Number(dest),  Number(elevCurFloor), elevID);
-		} else if (startFloor < elevCurFloor) { 
-			moveDownPickUp(Number(startFloor), Number(dest), Number(elevCurFloor), elevID);
-		} else {
-			if (startFloor < dest) {
-				$("#" + elevID + startFloor).css("background", "blue");
-				await sleep(1000)
-				$("#" + elevID + startFloor).css("background", "grey");
-				moveUpDropOff(Number(startFloor), Number(dest), Number(elevCurFloor), elevID);
-
-			} else if (startFloor > dest) {
-				$("#" + elevID + startFloor).css("background", "blue");
-				await sleep(1000);
-				$("#" + elevID + startFloor).css("background", "grey");
-				moveDownDropOff(Number(startFloor), Number(dest), Number(elevCurFloor), elevID)
-			}
-		}
-	} else if (!elevator3Full && queue.peek() != null) {
-		var p = queue.poll();
-		var startFloor = p.getStartFloor();
-		var dest = p.getDest();
-		var elevCurFloor = $(".curFloor3")[0].getAttribute("data-curFloor")
-		var elevID = $(".curFloor3")[0].getAttribute("data-id")
-		elevator3Full = true;
-		if (startFloor > elevCurFloor) {
-			moveUpPickUp(Number(startFloor), Number(dest),  Number(elevCurFloor), elevID);
-		} else if (startFloor < elevCurFloor) { 
-			moveDownPickUp(Number(startFloor), Number(dest), Number(elevCurFloor), elevID);
-		}
-		else {
-			if (startFloor < dest) {
-				$("#" + elevID + startFloor).css("background", "blue");
-				await sleep(1000)
-				$("#" + elevID + startFloor).css("background", "grey");
-				moveUpDropOff(Number(startFloor), Number(dest), Number(elevCurFloor), elevID);
-
-			} else if (startFloor > dest) {
-				$("#" + elevID + startFloor).css("background", "blue");
-				await sleep(1000);
-				$("#" + elevID + startFloor).css("background", "grey");
-				moveDownDropOff(Number(startFloor), Number(dest), Number(elevCurFloor), elevID)
-			}
-		}
-
-	}*/
-}
-
-async function arrived(dest, elevID) {
-	if (elevID === "e1f") {
-		$("#" + elevID + dest).css("background", "black");
-		elevator1Moving = false;
-		elevator1Full = false;
-		if (queue1.peek() != null) {
-			await sleep(1000);
-			pickUp("curFloor1");
-			/*else if (!elevator2Full && queue.peek() != null) {
-			pickUp();
-		} else if (!elevator3Full && queue.peek() != null) {	
-			pickUp();
-		}*/
-
-		}
-	}/* else if (elevID === "e2f") {
-		$("#" + elevID + dest).css("background", "black");
-		elevator2Full = false;
-		await sleep(1000);
-		if (!elevator2Full && queue.peek() != null) {
-			pickUp();
-		}
-	} else if (elevID === "e3f") {
-		$("#" + elevID + dest).css("background", "black");
-		elevator3Full = false;
-		await sleep(1000);
-		if (!elevator3Full && queue.peek() != null) {
-			pickUp();
-		}
-
-	}*/
-
-}
-
 
 
 
