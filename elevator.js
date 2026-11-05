@@ -1,519 +1,276 @@
+// elevator sim: look/scan scheduler with three animated cars
+// click a floor to set an origin, then click another to send a rider
+
+// config
+const FLOORS = 10;
+const CARS = 3;
+const CAPACITY = 8;          // riders per car
+const MOVE_MS = 600;         // one floor per step
+const DOOR_MS = 1000;        // doors open at every stop
+
+// helpers
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const sameDir = (passenger, dir) => Math.sign(passenger.dest - passenger.origin) === dir;
+
 class Passenger {
-	constructor(dest, startFloor, button) {
-		this.dest = dest;
-		this.startFloor = startFloor;
-		this.button = button;
-	}
-
-	getDest(){
-		return this.dest;
-	}
-
-	getStartFloor() {
-		return this.startFloor;
-	}
-
-	getButton() {
-		return this.button;
-	}
-
+    constructor(origin, dest) {
+        this.origin = origin;
+        this.dest = dest;
+        this.state = "waiting";  // waiting, aboard, done
+    }
 }
 
-class Queue {
-	constructor() {
-		this.elements = {};
-		this.head = 0;
-		this.tail = 0;
-		this.length = 0;
-	}
-
-	push(element) {
-		this.elements[this.tail] = element;
-		this.tail++;
-		this.length++;
-	}
-
-	poll() {
-		const item = this.elements[this.head];
-		delete this.elements[this.head];
-		this.head++;
-		this.length--;
-		return item;
-	}
-
-	peek() {
-		return this.elements[this.head];
-	}
-
-	size() {
-		return this.length;
-	}
-
-	isEmpty() {
-		return this.length == 0;
-	}
-}
-
-const sleep = (ms) =>
-	new Promise(resolve => setTimeout(resolve, ms));
 class Elevator {
-	constructor(elevID, curFloorClass) {
-		this.button;
-		this.elevatorFull = false;
-		this.elevatorMoving = false;
-		this.queue = new Queue();
-		this.elevID = elevID;
-		this.curFloorClass = curFloorClass;
-	}
-	async moveUpDropOff(startFloor, dest, elevCurFloor) {
-		this.elevatorMoving = true;
-		while (elevCurFloor < dest) {
-			let nextFloor = elevCurFloor + 1;
-			$("#" + this.elevID + nextFloor).css("background", "green");
-			$("#" + this.elevID + elevCurFloor).removeClass(this.curFloorClass);
-			$("#" + this.elevID + nextFloor).addClass(this.curFloorClass);
-			$("#" + this.elevID + elevCurFloor).css("background", "grey");
-			await sleep(1000);
-			elevCurFloor+=1;
-		}
-		if (elevCurFloor == dest){
-			this.arrived(dest);
-		}
-	}
+    constructor(id, render) {
+        this.id = id;
+        this.render = render;
+        this.floor = 1;
+        this.dir = 0;            // -1 down, 0 idle, 1 up
+        this.state = "idle";     // idle, moving, boarding
+        this.riders = [];
+        this.pickups = [];       // assigned riders still waiting at their origin
+        this.stops = new Set();
+        this.loop = null;
+    }
 
-	async moveDownDropOff(startFloor, dest, elevCurFloor) {
-		this.elevatorMoving = true;
-		while (elevCurFloor > dest) {
-			let nextFloor = elevCurFloor - 1;
-			$("#" + this.elevID + nextFloor).css("background", "green");
-			$("#" + this.elevID + elevCurFloor).removeClass(this.curFloorClass);
-			$("#" + this.elevID + nextFloor).addClass(this.curFloorClass);
-			$("#" + this.elevID + elevCurFloor).css("background", "grey");
-			await sleep(1000);
-			elevCurFloor -= 1;
-		}
-		if (elevCurFloor == dest){
-			this.arrived(dest);
-		}
-	}
+    // hand a waiting passenger to this car
+    assign(passenger) {
+        this.pickups.push(passenger);
+        this.syncStops();
+        if (!this.loop) this.loop = this.run();
+        this.render();
+    }
 
-	async moveUpPickUp(startFloor, dest, elevCurFloor, button) {
-		this.elevatorMoving = true;
-		while (elevCurFloor < startFloor) {
-			let nextFloor = elevCurFloor + 1;
-			$("#" + this.elevID +  nextFloor).css("background", "green");
-			$("#" + this.elevID + elevCurFloor).removeClass(this.curFloorClass);
-			$("#" + this.elevID + nextFloor).addClass(this.curFloorClass);
-			$("#" + this.elevID + elevCurFloor).css("background", "grey");
-			await sleep(1000);
-			elevCurFloor += 1;
-		}
-		if (elevCurFloor == startFloor)	{
-			$(button).css("background-color", "#212529");
-			this.elevatorFull = true;
-			if (startFloor < dest) {
-				$("#" + this.elevID + startFloor).css("background", "blue");
-				await sleep(1000);
-				$("#" + this.elevID + startFloor).css("background", "grey");
-				this.moveUpDropOff(startFloor, dest, elevCurFloor);
+    // stops are always derivable from pickups and rider destinations
+    syncStops() {
+        this.stops = new Set([
+            ...this.pickups.map((p) => p.origin),
+            ...this.riders.map((p) => p.dest),
+        ]);
+    }
 
-			} else if (startFloor > dest) {
-				$("#" + this.elevID + startFloor).css("background", "blue");
-				await sleep(1000);
-				$("#" + this.elevID + startFloor).css("background", "grey");
-				this.moveDownDropOff(startFloor, dest, elevCurFloor);
-			}
-		}
-	}
+    hasAhead() {
+        return [...this.stops].some((f) => (this.dir > 0 ? f > this.floor : f < this.floor));
+    }
 
+    hasBehind() {
+        return [...this.stops].some((f) => (this.dir > 0 ? f < this.floor : f > this.floor));
+    }
 
-	async moveDownPickUp(startFloor, dest, elevCurFloor, button) {
-		this.elevatorMoving = true;
-		while (elevCurFloor > startFloor) {
-			let nextFloor = elevCurFloor - 1;
-			$("#" + this.elevID + nextFloor).css("background", "green");
-			$("#" + this.elevID + elevCurFloor).removeClass(this.curFloorClass);
-			$("#" + this.elevID + nextFloor).addClass(this.curFloorClass);
-			$("#" + this.elevID + elevCurFloor).css("background", "grey");
-			await sleep(1000);
-			elevCurFloor -= 1;
-		}
-		if (elevCurFloor == startFloor)	{
-			$(button).css("background-color", "#212529");
-			this.elevatorFull = true;
-			if (startFloor < dest) {
-				$("#" + this.elevID + startFloor).css("background", "blue");
-				await sleep(1000);
-				$("#" + this.elevID + startFloor).css("background", "grey");
-				this.moveUpDropOff(startFloor, dest, elevCurFloor);
+    // nearest pending floor sets the initial direction
+    chooseDir() {
+        const pending = [...this.stops].filter((f) => f !== this.floor);
+        if (!pending.length) return 0;
+        const nearest = pending.reduce((a, b) =>
+            Math.abs(b - this.floor) < Math.abs(a - this.floor) ? b : a);
+        return nearest > this.floor ? 1 : -1;
+    }
 
-			} else if (startFloor > dest) {
-				$("#" + this.elevID + startFloor).css("background", "blue");
-				await sleep(1000);
-				$("#" + this.elevID + startFloor).css("background", "grey");
-				this.moveDownDropOff(startFloor, dest, elevCurFloor);
-			}
-		}
-	}
+    board(dir) {
+        const left = [];
+        for (const p of this.pickups) {
+            const here = p.origin === this.floor;
+            const fits = this.riders.length < CAPACITY;
+            if (here && fits && (dir === 0 || sameDir(p, dir))) {
+                p.state = "aboard";
+                this.riders.push(p);
+            } else {
+                left.push(p);
+            }
+        }
+        this.pickups = left;
+    }
 
+    // drop off, then board the current direction, flipping once at a turn
+    async service() {
+        this.state = "boarding";
+        this.render();
 
-	async pickUp() {
-		var p = this.queue.poll();
-		console.log(p);
-		var startFloor = parseInt(p.getStartFloor());
-		var dest = parseInt(p.getDest());
-		var elevCurFloor = parseInt($("." + this.curFloorClass)[0].getAttribute("data-curFloor"));
-		var button = p.getButton();
-		if (startFloor > elevCurFloor) {
-			this.moveUpPickUp(startFloor, dest, elevCurFloor, button);
-		} else if (startFloor < elevCurFloor) { 
-			this.moveDownPickUp(startFloor, dest, elevCurFloor, button);
-		} else {
-			await sleep(1000);
-			$(button).css("background-color", "#212529");
-			this.elevatorFull = true;
-			if (startFloor < dest) {
-				$("#" + this.elevID + startFloor).css("background", "blue");
-				await sleep(1000);
-				$("#" + this.elevID + startFloor).css("background", "grey");
-				this.moveUpDropOff(startFloor, dest, elevCurFloor);
+        this.riders = this.riders.filter((p) => {
+            if (p.dest !== this.floor) return true;
+            p.state = "done";
+            flashFloor(this.floor);
+            return false;
+        });
 
-			} else if (startFloor > dest) {
-				$("#" + this.elevID + startFloor).css("background", "blue");
-				await sleep(1000);
-				$("#" + this.elevID + startFloor).css("background", "grey");
-				this.moveDownDropOff(startFloor, dest, elevCurFloor);
-			}
-		}
-	}
+        if (this.dir === 0) this.dir = this.chooseDir();
+        this.syncStops();
+        this.board(this.dir);
+        this.syncStops();
 
-	async arrived(dest) {
-		$("#" + this.elevID + dest).css("background", "black");
-		this.elevatorMoving = false;
-		this.elevatorFull = false;
-		if (!this.queue.isEmpty()) {
-			await sleep(1000);
-			this.pickUp();
-		}
-	}
+        if (!this.hasAhead()) {
+            this.dir = -this.dir;  // turn around at the end of the run
+            this.board(this.dir);
+            this.syncStops();
+        }
 
-	isFull() {
-		return this.elevatorFull;
-	}
+        this.render();
+        await sleep(DOOR_MS);
+    }
 
-	isMoving() {
-		return this.elevatorMoving;
-	}
+    async moveOne() {
+        this.state = "moving";
+        this.floor += this.dir;
+        this.render();
+        await sleep(MOVE_MS);
+    }
 
-	getQueue() {
-		return this.queue;
-	}
+    // look/scan: service every stop in one direction, then reverse
+    async run() {
+        while (true) {
+            if (this.stops.has(this.floor)) {
+                await this.service();
+            }
+            if (!this.stops.size) break;
+            if (this.dir === 0) this.dir = this.chooseDir();
+            if (!this.hasAhead()) {
+                if (!this.hasBehind()) break;
+                this.dir = -this.dir;
+            }
+            await this.moveOne();
+        }
+        this.dir = 0;
+        this.state = "idle";
+        this.render();
+        this.loop = null;
+    }
 }
 
-var elevator1 = new Elevator("e1f", "curFloor1");
-var elevator2 = new Elevator("e2f", "curFloor2");
-var elevator3 = new Elevator("e3f", "curFloor3");
-$( document ).ready(function() {
-	$(".floor1").unbind('click').click(function() {
-		var button = this;
-		var dest = $(this).val();
-		var startFloor = this.getAttribute("data-floor");	
-		if (dest != '' && startFloor != null) {
-			let q1Size = elevator1.getQueue().size();
-			let q2Size = elevator2.getQueue().size();
-			let q3Size = elevator3.getQueue().size();
-			if (elevator1.getQueue().isEmpty() && !elevator1.isFull() && !elevator1.isMoving()) {
-				elevator1.getQueue().push(new Passenger(dest, startFloor, button));
-			} else if (elevator2.getQueue().isEmpty() && !elevator2.isFull()  && !elevator2.isMoving()) {
-				elevator2.getQueue().push(new Passenger(dest, startFloor, button));
-			} 
-			else if (elevator3.getQueue().isEmpty() && !elevator3.isFull()  && !elevator3.isMoving()) {
-				elevator3.getQueue().push(new Passenger(dest, startFloor, button));
-			} else {
-				let min = Math.min(q1Size, Math.min(q2Size, q3Size));
-				if (min == q1Size) {
-					elevator1.getQueue().push(new Passenger(dest, startFloor, button));
-				} else if (min == q2Size) {
-					elevator2.getQueue().push(new Passenger(dest, startFloor, button));
-				} else if (min == q3Size) {
-					elevator3.getQueue().push(new Passenger(dest, startFloor, button));
-				}
-			}
-		}
-	});
-	$(".floor2").unbind('click').click(function() {
-		var button = this;
-		var dest = $(this).val();
-		var startFloor = this.getAttribute("data-floor");	
-		if (dest != '' && startFloor != null) {
-			let q1Size = elevator1.getQueue().size();
-			let q2Size = elevator2.getQueue().size();
-			let q3Size = elevator3.getQueue().size();
-			if (elevator1.getQueue().isEmpty() && !elevator1.isFull() && !elevator1.isMoving()) {
-				elevator1.getQueue().push(new Passenger(dest, startFloor, button));
-			} else if (elevator2.getQueue().isEmpty() && !elevator2.isFull()  && !elevator2.isMoving()) {
-				elevator2.getQueue().push(new Passenger(dest, startFloor, button));
-			} 
-			else if (elevator3.getQueue().isEmpty() && !elevator3.isFull()  && !elevator3.isMoving()) {
-				elevator3.getQueue().push(new Passenger(dest, startFloor, button));
-			} else {
-				let min = Math.min(q1Size, Math.min(q2Size, q3Size));
-				if (min == q1Size) {
-					elevator1.getQueue().push(new Passenger(dest, startFloor, button));
-				} else if (min == q2Size) {
-					elevator2.getQueue().push(new Passenger(dest, startFloor, button));
-				} else if (min == q3Size) {
-					elevator3.getQueue().push(new Passenger(dest, startFloor, button));
-				}
-			}
-		}
-	});
-	$(".floor3").unbind('click').click(function() {
-		var button = this;
-		var dest = $(this).val();
-		var startFloor = this.getAttribute("data-floor");	
-		if (dest != '' && startFloor != null) {
-			let q1Size = elevator1.getQueue().size();
-			let q2Size = elevator2.getQueue().size();
-			let q3Size = elevator3.getQueue().size();
-			if (elevator1.getQueue().isEmpty() && !elevator1.isFull() && !elevator1.isMoving()) {
-				elevator1.getQueue().push(new Passenger(dest, startFloor, button));
-			} else if (elevator2.getQueue().isEmpty() && !elevator2.isFull()  && !elevator2.isMoving()) {
-				elevator2.getQueue().push(new Passenger(dest, startFloor, button));
-			} 
-			else if (elevator3.getQueue().isEmpty() && !elevator3.isFull()  && !elevator3.isMoving()) {
-				elevator3.getQueue().push(new Passenger(dest, startFloor, button));
-			} else {
-				let min = Math.min(q1Size, Math.min(q2Size, q3Size));
-				if (min == q1Size) {
-					elevator1.getQueue().push(new Passenger(dest, startFloor, button));
-				} else if (min == q2Size) {
-					elevator2.getQueue().push(new Passenger(dest, startFloor, button));
-				} else if (min == q3Size) {
-					elevator3.getQueue().push(new Passenger(dest, startFloor, button));
-				}
-			}
-		}
-	});
-	$(".floor4").unbind('click').click(function() {
-		var button = this;
-		var dest = $(this).val();
-		var startFloor = this.getAttribute("data-floor");	
-		if (dest != '' && startFloor != null) {
-			let q1Size = elevator1.getQueue().size();
-			let q2Size = elevator2.getQueue().size();
-			let q3Size = elevator3.getQueue().size();
-			if (elevator1.getQueue().isEmpty() && !elevator1.isFull() && !elevator1.isMoving()) {
-				elevator1.getQueue().push(new Passenger(dest, startFloor, button));
-			} else if (elevator2.getQueue().isEmpty() && !elevator2.isFull()  && !elevator2.isMoving()) {
-				elevator2.getQueue().push(new Passenger(dest, startFloor, button));
-			} 
-			else if (elevator3.getQueue().isEmpty() && !elevator3.isFull()  && !elevator3.isMoving()) {
-				elevator3.getQueue().push(new Passenger(dest, startFloor, button));
-			} else {
-				let min = Math.min(q1Size, Math.min(q2Size, q3Size));
-				if (min == q1Size) {
-					elevator1.getQueue().push(new Passenger(dest, startFloor, button));
-				} else if (min == q2Size) {
-					elevator2.getQueue().push(new Passenger(dest, startFloor, button));
-				} else if (min == q3Size) {
-					elevator3.getQueue().push(new Passenger(dest, startFloor, button));
-				}
-			}
-		}
-	});
-	$(".floor5").unbind('click').click(function() {
-		var button = this;
-		var dest = $(this).val();
-		var startFloor = this.getAttribute("data-floor");	
-		if (dest != '' && startFloor != null) {
-			let q1Size = elevator1.getQueue().size();
-			let q2Size = elevator2.getQueue().size();
-			let q3Size = elevator3.getQueue().size();
-			if (elevator1.getQueue().isEmpty() && !elevator1.isFull() && !elevator1.isMoving()) {
-				elevator1.getQueue().push(new Passenger(dest, startFloor, button));
-			} else if (elevator2.getQueue().isEmpty() && !elevator2.isFull()  && !elevator2.isMoving()) {
-				elevator2.getQueue().push(new Passenger(dest, startFloor, button));
-			} 
-			else if (elevator3.getQueue().isEmpty() && !elevator3.isFull()  && !elevator3.isMoving()) {
-				elevator3.getQueue().push(new Passenger(dest, startFloor, button));
-			} else {
-				let min = Math.min(q1Size, Math.min(q2Size, q3Size));
-				if (min == q1Size) {
-					elevator1.getQueue().push(new Passenger(dest, startFloor, button));
-				} else if (min == q2Size) {
-					elevator2.getQueue().push(new Passenger(dest, startFloor, button));
-				} else if (min == q3Size) {
-					elevator3.getQueue().push(new Passenger(dest, startFloor, button));
-				}
-			}
-		}
-	});
-	$(".floor6").unbind('click').click(function() {
-		var button = this;
-		var dest = $(this).val();
-		var startFloor = this.getAttribute("data-floor");	
-		if (dest != '' && startFloor != null) {
-			let q1Size = elevator1.getQueue().size();
-			let q2Size = elevator2.getQueue().size();
-			let q3Size = elevator3.getQueue().size();
-			if (elevator1.getQueue().isEmpty() && !elevator1.isFull() && !elevator1.isMoving()) {
-				elevator1.getQueue().push(new Passenger(dest, startFloor, button));
-			} else if (elevator2.getQueue().isEmpty() && !elevator2.isFull()  && !elevator2.isMoving()) {
-				elevator2.getQueue().push(new Passenger(dest, startFloor, button));
-			} 
-			else if (elevator3.getQueue().isEmpty() && !elevator3.isFull()  && !elevator3.isMoving()) {
-				elevator3.getQueue().push(new Passenger(dest, startFloor, button));
-			} else {
-				let min = Math.min(q1Size, Math.min(q2Size, q3Size));
-				if (min == q1Size) {
-					elevator1.getQueue().push(new Passenger(dest, startFloor, button));
-				} else if (min == q2Size) {
-					elevator2.getQueue().push(new Passenger(dest, startFloor, button));
-				} else if (min == q3Size) {
-					elevator3.getQueue().push(new Passenger(dest, startFloor, button));
-				}
-			}
-		}
-	});
-	$(".floor7").unbind('click').click(function() {
-		var button = this;
-		var dest = $(this).val();
-		var startFloor = this.getAttribute("data-floor");	
-		if (dest != '' && startFloor != null) {
-			let q1Size = elevator1.getQueue().size();
-			let q2Size = elevator2.getQueue().size();
-			let q3Size = elevator3.getQueue().size();
-			if (elevator1.getQueue().isEmpty() && !elevator1.isFull() && !elevator1.isMoving()) {
-				elevator1.getQueue().push(new Passenger(dest, startFloor, button));
-			} else if (elevator2.getQueue().isEmpty() && !elevator2.isFull()  && !elevator2.isMoving()) {
-				elevator2.getQueue().push(new Passenger(dest, startFloor, button));
-			} 
-			else if (elevator3.getQueue().isEmpty() && !elevator3.isFull()  && !elevator3.isMoving()) {
-				elevator3.getQueue().push(new Passenger(dest, startFloor, button));
-			} else {
-				let min = Math.min(q1Size, Math.min(q2Size, q3Size));
-				if (min == q1Size) {
-					elevator1.getQueue().push(new Passenger(dest, startFloor, button));
-				} else if (min == q2Size) {
-					elevator2.getQueue().push(new Passenger(dest, startFloor, button));
-				} else if (min == q3Size) {
-					elevator3.getQueue().push(new Passenger(dest, startFloor, button));
-				}
-			}
-		}
-	});
-	$(".floor8").unbind('click').click(function() {
-		var button = this;
-		var dest = $(this).val();
-		var startFloor = this.getAttribute("data-floor");	
-		if (dest != '' && startFloor != null) {
-			let q1Size = elevator1.getQueue().size();
-			let q2Size = elevator2.getQueue().size();
-			let q3Size = elevator3.getQueue().size();
-			if (elevator1.getQueue().isEmpty() && !elevator1.isFull() && !elevator1.isMoving()) {
-				elevator1.getQueue().push(new Passenger(dest, startFloor, button));
-			} else if (elevator2.getQueue().isEmpty() && !elevator2.isFull()  && !elevator2.isMoving()) {
-				elevator2.getQueue().push(new Passenger(dest, startFloor, button));
-			} 
-			else if (elevator3.getQueue().isEmpty() && !elevator3.isFull()  && !elevator3.isMoving()) {
-				elevator3.getQueue().push(new Passenger(dest, startFloor, button));
-			} else {
-				let min = Math.min(q1Size, Math.min(q2Size, q3Size));
-				if (min == q1Size) {
-					elevator1.getQueue().push(new Passenger(dest, startFloor, button));
-				} else if (min == q2Size) {
-					elevator2.getQueue().push(new Passenger(dest, startFloor, button));
-				} else if (min == q3Size) {
-					elevator3.getQueue().push(new Passenger(dest, startFloor, button));
-				}
-			}
-		}
-	});
-	$(".floor9").unbind('click').click(function() {
-		var button = this;
-		var dest = $(this).val();
-		var startFloor = this.getAttribute("data-floor");	
-		if (dest != '' && startFloor != null) {
-			let q1Size = elevator1.getQueue().size();
-			let q2Size = elevator2.getQueue().size();
-			let q3Size = elevator3.getQueue().size();
-			if (elevator1.getQueue().isEmpty() && !elevator1.isFull() && !elevator1.isMoving()) {
-				elevator1.getQueue().push(new Passenger(dest, startFloor, button));
-			} else if (elevator2.getQueue().isEmpty() && !elevator2.isFull()  && !elevator2.isMoving()) {
-				elevator2.getQueue().push(new Passenger(dest, startFloor, button));
-			} 
-			else if (elevator3.getQueue().isEmpty() && !elevator3.isFull()  && !elevator3.isMoving()) {
-				elevator3.getQueue().push(new Passenger(dest, startFloor, button));
-			} else {
-				let min = Math.min(q1Size, Math.min(q2Size, q3Size));
-				if (min == q1Size) {
-					elevator1.getQueue().push(new Passenger(dest, startFloor, button));
-				} else if (min == q2Size) {
-					elevator2.getQueue().push(new Passenger(dest, startFloor, button));
-				} else if (min == q3Size) {
-					elevator3.getQueue().push(new Passenger(dest, startFloor, button));
-				}
-			}
-		}
-	});
-	$(".floor10").unbind('click').click(function() {
-		var button = this;
-		var dest = $(this).val();
-		var startFloor = this.getAttribute("data-floor");	
-		if (dest != '' && startFloor != null) {
-			let q1Size = elevator1.getQueue().size();
-			let q2Size = elevator2.getQueue().size();
-			let q3Size = elevator3.getQueue().size();
-			if (elevator1.getQueue().isEmpty() && !elevator1.isFull() && !elevator1.isMoving()) {
-				elevator1.getQueue().push(new Passenger(dest, startFloor, button));
-			} else if (elevator2.getQueue().isEmpty() && !elevator2.isFull()  && !elevator2.isMoving()) {
-				elevator2.getQueue().push(new Passenger(dest, startFloor, button));
-			} 
-			else if (elevator3.getQueue().isEmpty() && !elevator3.isFull()  && !elevator3.isMoving()) {
-				elevator3.getQueue().push(new Passenger(dest, startFloor, button));
-			} else {
-				let min = Math.min(q1Size, Math.min(q2Size, q3Size));
-				if (min == q1Size) {
-					elevator1.getQueue().push(new Passenger(dest, startFloor, button));
-				} else if (min == q2Size) {
-					elevator2.getQueue().push(new Passenger(dest, startFloor, button));
-				} else if (min == q3Size) {
-					elevator3.getQueue().push(new Passenger(dest, startFloor, button));
-				}
-			}
-		}
-	});
+// simulation
+function dispatch(passenger) {
+    if (passenger.origin === passenger.dest) {
+        passenger.state = "done";
+        flashFloor(passenger.origin);
+        return;
+    }
 
-	$(".btn").click(function() {
-		var button = this;
-		$(button).css("background-color", "grey");
-		if (!elevator1.isFull() && !elevator1.isMoving() && elevator1.getQueue().peek() != null) {
-			elevator1.pickUp();
-		} else if (!elevator2.isFull() && !elevator2.isMoving() && elevator2.getQueue().peek() != null) {
-			elevator2.pickUp();
-		} else if (!elevator3.isFull() && !elevator3.isMoving() && elevator3.getQueue().peek() != null) {
-			elevator3.pickUp();
-		}
-	});
+    let best = null;
+    let bestCost = Infinity;
+    for (const car of elevators) {
+        const cost = Math.abs(car.floor - passenger.origin) + car.stops.size;
+        if (cost < bestCost) {
+            bestCost = cost;
+            best = car;
+        }
+    }
+    best.assign(passenger);
+}
 
-});
+// ui
+const building = document.getElementById("building");
+const hint = document.getElementById("hint");
+const floorViews = new Map();
+const carViews = [];
+let selectedOrigin = null;
 
+function make(tag, className, text) {
+    const el = document.createElement(tag);
+    if (className) el.className = className;
+    if (text != null) el.textContent = text;
+    return el;
+}
 
+function buildUI() {
+    const floors = make("section", "floors");
+    for (let f = FLOORS; f >= 1; f--) {
+        const strip = make("button", "floor-strip");
+        strip.type = "button";
+        strip.dataset.floor = String(f);
+        const wait = make("span", "floor-wait");
+        strip.append(make("span", "floor-num", String(f)), wait);
+        strip.addEventListener("click", () => onFloorClick(f));
+        floors.append(strip);
+        floorViews.set(f, { strip, wait });
+    }
+    building.append(floors);
 
+    for (let i = 0; i < CARS; i++) {
+        const shaft = make("section", "shaft");
+        const car = make("div", "car idle");
+        const dir = make("span", "car-dir", "");
+        const head = make("span", "car-head");
+        head.append(make("span", "car-id", `e${i + 1}`), dir);
+        const floor = make("span", "car-floor", "1");
+        const load = make("span", "car-load", `0/${CAPACITY}`);
+        car.append(head, floor, load);
+        shaft.append(car);
+        building.append(shaft);
+        carViews.push({ car, dir, floor, load });
+    }
+}
 
+function render() {
+    elevators.forEach((car, i) => {
+        const view = carViews[i];
+        view.car.className = `car ${car.state}`;
+        view.car.style.transform = `translateY(${(FLOORS - car.floor) * 100}%)`;
+        view.dir.textContent = car.dir > 0 ? "▲" : car.dir < 0 ? "▼" : "";
+        view.floor.textContent = String(car.floor);
+        view.load.textContent = `${car.riders.length}/${CAPACITY}`;
+    });
 
+    const waiting = new Map();
+    for (const car of elevators) {
+        for (const p of car.pickups) {
+            if (p.state !== "waiting") continue;
+            if (!waiting.has(p.origin)) waiting.set(p.origin, []);
+            waiting.get(p.origin).push(p);
+        }
+    }
 
+    for (const [f, view] of floorViews) {
+        const chips = (waiting.get(f) || []).map((p) => make("span", "chip", `→${p.dest}`));
+        view.wait.replaceChildren(...chips);
+        view.strip.classList.toggle("selected", f === selectedOrigin);
+    }
+}
 
+function flashFloor(floor) {
+    const view = floorViews.get(floor);
+    if (!view) return;
+    view.strip.classList.remove("flash");
+    void view.strip.offsetWidth;  // restart the css animation
+    view.strip.classList.add("flash");
+    view.strip.addEventListener("animationend", () => view.strip.classList.remove("flash"), { once: true });
+}
 
+function onFloorClick(floor) {
+    if (selectedOrigin === null) {
+        selectedOrigin = floor;
+        hint.textContent = `from floor ${floor}: pick a destination`;
+    } else if (selectedOrigin === floor) {
+        selectedOrigin = null;
+        hint.textContent = "click a floor to set an origin";
+    } else {
+        dispatch(new Passenger(selectedOrigin, floor));
+        selectedOrigin = null;
+        hint.textContent = "click a floor to set an origin";
+    }
+    render();
+}
 
+function reset() {
+    for (const car of elevators) {
+        car.riders = [];
+        car.pickups = [];
+        car.stops = new Set();
+        car.dir = 0;
+        car.floor = 1;
+        car.state = "idle";
+    }
+    selectedOrigin = null;
+    hint.textContent = "click a floor to set an origin";
+    render();
+}
 
+// main
+const elevators = [
+    new Elevator("e1", render),
+    new Elevator("e2", render),
+    new Elevator("e3", render),
+];
 
-
-
-
-
-
-
-
-
+document.documentElement.style.setProperty("--move-ms", `${MOVE_MS}ms`);
+buildUI();
+render();
+document.getElementById("reset").addEventListener("click", reset);
